@@ -9,7 +9,9 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
+    "html-inline-css-webpack-plugin": "^1.11.1",
     "html-webpack-plugin": "^5.5.0",
-    "inline-source-webpack-plugin": "^2.0.1"
+    "inline-source-webpack-plugin": "^2.0.1",
+    "mini-css-extract-plugin": "^2.6.1"
   }
 }
