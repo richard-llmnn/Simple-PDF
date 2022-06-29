@@ -1,0 +1,7 @@
+{
+  "name": "Simple-PDF",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:richard-llmnn/Simple-PDF.git",
+  "license": "MIT"
+}
