@@ -1,11 +1,19 @@
 import * as pdfjsLib from 'pdfjs-dist/webpack';
 import {Sortable} from "@shopify/draggable";
+import Dropzone from "dropzone";
 
 // make html elements draggable
 const container = document.querySelector("#drag-area");
 const drag = new Sortable(container, {
     draggable: ".card-auto-size",
 })
+
+let myDropzone = new Dropzone("#drag-area", { autoProcessQueue: false, url: "#" });
+myDropzone.on("addedfile", file => {
+    alert(`File added: ${file.name}`);
+    myDropzone.removeAllFiles()
+});
+
 
 
 const input = document.createElement("input");

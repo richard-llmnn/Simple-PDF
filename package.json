@@ -20,7 +20,8 @@
   "dependencies": {
     "@shopify/draggable": "^1.0.0-beta.8",
     "bootstrap": "^5.1.0",
-    "css.gg": "^2.0.0"
+    "css.gg": "^2.0.0",
+    "dropzone": "^6.0.0-beta.2",
     "pdfjs-dist": "^2.14.305",
     "purecss": "^2.1.0",
     "worker-loader": "^3.0.8"
