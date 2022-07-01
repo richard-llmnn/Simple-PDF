@@ -1,4 +1,11 @@
 import * as pdfjsLib from 'pdfjs-dist/webpack';
+import {Sortable} from "@shopify/draggable";
+
+// make html elements draggable
+const container = document.querySelector("#drag-area");
+const drag = new Sortable(container, {
+    draggable: ".card-auto-size",
+})
 
 
 const input = document.createElement("input");

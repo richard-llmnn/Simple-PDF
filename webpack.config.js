@@ -37,9 +37,9 @@ module.exports = {
             hash: false,
             minify: false
         }),
-        new PurgecssPlugin({
-            paths: glob.sync(`${path.join(__dirname, "src")}/**/*`, { nodir: true })
-        }),
+        // new PurgecssPlugin({
+        //     paths: glob.sync(`${path.join(__dirname, "src")}/**/*`, { nodir: true })
+        // }),
     ],
     module: {
         rules: [

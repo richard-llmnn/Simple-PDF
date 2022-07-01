@@ -1,8 +1,15 @@
 @forward "bootstrap/scss/bootstrap";
 @forward "icons";
 
-
 .card-auto-size {
-  min-width: 8rem;
+  //min-width: 10rem;
+  //max-width: 22rem;
+  //width: 100%;
   width: 20vw;
+  min-width: 10rem;
+}
+
+.draggable--over {
+  border: 0.5rem dotted red;
+  transition: 2s ease-in-out;
 }
