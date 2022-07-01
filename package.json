@@ -18,12 +18,13 @@
     "webpack-dev-server": "^4.9.2"
   },
   "dependencies": {
-    "purecss": "^2.1.0"
+    "bootstrap": "^5.1.0",
+    "css.gg": "^2.0.0"
   },
   "scripts": {
     "build-dev": "webpack build && yarn run bundle",
     "build-prod": "webpack build --mode='production' && yarn run bundle",
     "bundle": "inline-script-tags dist/index.html dist/index.html && inline-stylesheets dist/index.html dist/index.html",
-    "serve-dev": "webpack serve"
+    "serve": "webpack serve"
   }
 }

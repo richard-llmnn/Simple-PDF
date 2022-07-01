@@ -16,8 +16,8 @@ module.exports = {
     devServer: {
         open: false,
         port: 9000,
-        hot: true,
-        liveReload: true,
+        hot: false,
+        liveReload: false,
         static: {
             directory: path.join(__dirname, 'dist'), // to make icons available because they are static generated
         },
@@ -25,7 +25,7 @@ module.exports = {
             progress: true,
             overlay: true,
             logging: "error",
-        },
+        }
     },
     plugins: [
         new CleanWebpackPlugin(),

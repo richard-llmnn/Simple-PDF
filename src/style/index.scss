@@ -1,1 +1,8 @@
- @forward "purecss";
+@forward "bootstrap/scss/bootstrap";
+@forward "icons";
+
+
+.card-auto-size {
+  min-width: 8rem;
+  width: 20vw;
+}
