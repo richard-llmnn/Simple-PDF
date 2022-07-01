@@ -20,6 +20,9 @@
   "dependencies": {
     "bootstrap": "^5.1.0",
     "css.gg": "^2.0.0"
+    "pdfjs-dist": "^2.14.305",
+    "purecss": "^2.1.0",
+    "worker-loader": "^3.0.8"
   },
   "scripts": {
     "build-dev": "webpack build && yarn run bundle",
