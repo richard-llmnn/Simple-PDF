@@ -27,10 +27,12 @@ myDropzone.on("addedfiles", async files => {
     for (const file of files) {
         await processFile(file);
     }
+    myDropzone.removeAllFiles();
 })
 
 async function processFile(file){
     //myDropzone.element.classList.add("d-none");
+    myDropzone.emit("uploadprogress", file, 0)
     if (file.type !== "application/pdf") {
         myDropzone.removeFile(file);
         alert("Keine PDF-Datein / Invalid PDF file!")
@@ -40,7 +42,10 @@ async function processFile(file){
 
     const pdfFile = filesObject[filesCounter];
     const pdfDoc = await pdfjsLib.getDocument(pdfFile).promise
-    for (let pageIndex = 1; pageIndex <= await pdfDoc.numPages; pageIndex++){
+    const pageAmount = await pdfDoc.numPages
+    for (let pageIndex = 1; pageIndex <= pageAmount; pageIndex++){
+        myDropzone.emit("uploadprogress", file, Math.round(pageIndex / pageAmount * 100));
+
         const pdfPage = await pdfDoc.getPage(pageIndex);
         let pdfViewport = pdfPage.getViewport({scale: 1});
         let scale = 1;
@@ -74,7 +79,6 @@ async function processFile(file){
         pageCounter++;
     }
     filesCounter++;
-    myDropzone.removeAllFiles()
 }
 
 window.removePage = function (pageID)
