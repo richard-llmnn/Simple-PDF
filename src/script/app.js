@@ -1,8 +1,12 @@
 import * as pdfjsLib from 'pdfjs-dist/webpack';
+import {PDFDocument} from "pdf-lib";
 import {Sortable} from "@shopify/draggable";
 import Dropzone from "dropzone";
 
 let pageCounter = 1;
+let pagesObject = {};
+let filesCounter = 1;
+let filesObject = {};
 
 // make html elements draggable
 const container = document.querySelector("#drag-area");
@@ -10,11 +14,32 @@ const drag = new Sortable(container, {
     draggable: ".card-auto-size",
 })
 
-let myDropzone = new Dropzone("#dropzone", { autoProcessQueue: false, url: "#", acceptedFiles: ".pdf" });
-myDropzone.on("addedfile", async file => {
+let myDropzone = new Dropzone(
+    "#dropzone",
+    {
+        autoProcessQueue: false,
+        url: "#",
+        acceptedFiles: ".pdf",
+        uploadMultiple: true,
+    });
+
+myDropzone.on("addedfiles", async files => {
+    for (const file of files) {
+        await processFile(file);
+    }
+})
+
+async function processFile(file){
     //myDropzone.element.classList.add("d-none");
-    const pdfFile = file
-    const pdfDoc = await pdfjsLib.getDocument(await pdfFile.arrayBuffer()).promise
+    if (file.type !== "application/pdf") {
+        myDropzone.removeFile(file);
+        alert("Keine PDF-Datein / Invalid PDF file!")
+        return;
+    }
+    filesObject[filesCounter] = await file.arrayBuffer();
+
+    const pdfFile = filesObject[filesCounter];
+    const pdfDoc = await pdfjsLib.getDocument(pdfFile).promise
     for (let pageIndex = 1; pageIndex <= await pdfDoc.numPages; pageIndex++){
         const pdfPage = await pdfDoc.getPage(pageIndex);
         let pdfViewport = pdfPage.getViewport({scale: 1});
@@ -38,18 +63,26 @@ myDropzone.on("addedfile", async file => {
 
         container.insertAdjacentElement("beforeend", card);
     
-        pdfPage.render({canvasContext: context, viewport: pdfViewport});
+        pdfPage.render({
+            canvasContext: context,
+            viewport: pdfViewport
+        });
+        pagesObject[pageCounter] = {
+            pageIndex: pageIndex,
+            pdfIndex: filesCounter
+        };
         pageCounter++;
     }
+    filesCounter++;
     myDropzone.removeAllFiles()
-});
+}
 
 window.removePage = function (pageID)
 {
     const page = document.querySelector('div[data-page-id="'+pageID+'"]');
-    console.log(page)
     if (page && confirm(`Seite ${pageID} entfernen? | Remove page ${pageID}?`) === true) {
-        page.remove()
+        page.remove();
+        delete pagesObject[pageID];
     }
 }
 
@@ -74,12 +107,31 @@ const template = page => {
     return container.firstElementChild;
 }
 
-window.savePDF = function ()
+window.savePDF = async function ()
 {
-    const pages = document.querySelector("#drag-area").querySelectorAll("div[data-page-id]");
-    const idList = [];
-    for (const page of pages) {
-        idList.push(page.dataset.pageId)
+    const pdfDocumentCache = {};
+    const finalPDF = await PDFDocument.create();
+    const pagesElements = document.querySelector("#drag-area").querySelectorAll("div[data-page-id]");
+    for (const pageElement of pagesElements) {
+        const pageId = pageElement.dataset.pageId
+        const page = pagesObject[pageId]
+        if(!pdfDocumentCache.hasOwnProperty(page.pdfIndex)) {
+            pdfDocumentCache[page.pdfIndex] = await PDFDocument.load(filesObject[page.pdfIndex]);
+        }
+        finalPDF.addPage((await finalPDF.copyPages(
+            pdfDocumentCache[page.pdfIndex],
+            [page.pageIndex - 1]
+        ))[0])
     }
-    // TODO: create list from page ids
+
+    const pdf = new Blob([await finalPDF.save()], {
+        type: "application/pdf"
+    })
+
+    let link = document.createElement("a");
+    link.download = prompt("[Dateiname/Filename].pdf") + ".pdf";
+    link.href = URL.createObjectURL(pdf);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
