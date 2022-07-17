@@ -2,8 +2,6 @@ const path = require( 'path' );
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const PurgecssPlugin = require('purgecss-webpack-plugin');
-const glob = require("glob");
 
 module.exports = {
     entry: {
@@ -37,10 +35,7 @@ module.exports = {
             favicon: false, // do not user favicon, because we set multiple icons in the template
             hash: false,
             minify: false
-        }),
-        // new PurgecssPlugin({
-        //     paths: glob.sync(`${path.join(__dirname, "src")}/**/*`, { nodir: true })
-        // }),
+        })
     ],
     module: {
         rules: [

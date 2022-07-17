@@ -10,7 +10,6 @@
     "html-webpack-plugin": "^5.5.0",
     "inline-scripts": "^1.7.4",
     "mini-css-extract-plugin": "^2.6.1",
-    "purgecss-webpack-plugin": "^4.1.3",
     "sass": "^1.53.0",
     "sass-loader": "^13.0.2",
     "webpack": "^5.73.0",
@@ -27,9 +26,8 @@
     "worker-loader": "^3.0.8"
   },
   "scripts": {
-    "build-dev": "webpack build && yarn run bundle",
-    "build-prod": "webpack build --mode='production' && yarn run bundle",
-    "bundle": "inline-script-tags dist/index.html dist/index.html && inline-stylesheets dist/index.html dist/index.html",
+    "build-dev": "webpack build",
+    "build-prod": "webpack build --mode='production'",
     "serve": "webpack serve"
   }
 }
