@@ -1356,11 +1356,6 @@ inherits@2.0.3:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha512-x00IRNXNy63jwGkJmzPigoySHbaqpNuzKbBOmzK+g2OdZpQ9w+sxCN+VSB3ja7IAge2OP2qpfxTjeNcyjmW1uw==
 
-inline-scripts@^1.7.4:
-  version "1.7.4"
-  resolved "https://registry.yarnpkg.com/inline-scripts/-/inline-scripts-1.7.4.tgz#54f4d5d9a3e830d4c31e9bb59bf12783a516351d"
-  integrity sha512-iEuBe8HfhzNlllODod145vW+hh1HJv/aGXkSq6dsDa/m0fmos8UGmtilmu8LykABqJWVGCP2qRexo6VqpL0OZA==
-
 interpret@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-2.2.0.tgz#1a78a0b5965c40a5416d007ad6f50ad27c417df9"
