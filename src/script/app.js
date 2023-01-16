@@ -21,6 +21,7 @@ let myDropzone = new Dropzone(
         url: "#",
         acceptedFiles: ".pdf",
         uploadMultiple: true,
+        dictDefaultMessage: "Dateien zum Hochladen hier ablegen / Drop files here to upload"
     });
 
 myDropzone.on("addedfiles", async files => {
@@ -63,7 +64,7 @@ async function processFile(file){
         canvas.width = pdfViewport.width;
         canvas.classList.add("card-img-top");
         
-        const card = template(pageCounter);
+        const card = template(pageCounter, ("name" in file)? file.name: null);
         card.querySelector('.card-body').insertAdjacentElement("afterbegin", canvas);
 
         container.insertAdjacentElement("beforeend", card);
@@ -98,11 +99,12 @@ window.resetPage = function () {
 
 
 
-const template = page => {
+const template = (page, fileName = null) => {
     const container = document.createElement("span");
     container.innerHTML = `
         <div class="card card-auto-size" data-page-id="${page}">
-            <div class="card-header bg-warning p-1 text-center">${page}</div>
+            <div class="card-header bg-warning p-1 text-center"><b>${page}</b></div>
+            ${fileName !== null? `<div class="card-header bg-warning p-1 text-center">(${fileName})</div>`: ""}
             <div class="card-body p-0"></div>
             <div class="card-footer bg-danger p-0">
                 <button class="btn btn-danger w-100 m-0 p-3" onclick="removePage(${page})"><i class="gg-trash mx-auto"></i></button>
@@ -113,6 +115,14 @@ const template = page => {
 
 window.savePDF = async function ()
 {
+    // ask user for new file name
+    let downloadFileName = prompt("[Dateiname/Filename].pdf");
+    if (downloadFileName === null || downloadFileName === "" || downloadFileName.trim().length < 1) {
+        alert("Dateiname nicht gültig! / Filename not valid!")
+        return;
+    }
+
+    // merge pdfs
     const pdfDocumentCache = {};
     const finalPDF = await PDFDocument.create();
     const pagesElements = document.querySelector("#drag-area").querySelectorAll("div[data-page-id]");
@@ -128,12 +138,13 @@ window.savePDF = async function ()
         ))[0])
     }
 
+    // generate and downlaod blob
     const pdf = new Blob([await finalPDF.save()], {
         type: "application/pdf"
     })
 
     let link = document.createElement("a");
-    link.download = prompt("[Dateiname/Filename].pdf") + ".pdf";
+    link.download = downloadFileName + ".pdf";
     link.href = URL.createObjectURL(pdf);
     document.body.appendChild(link);
     link.click();
