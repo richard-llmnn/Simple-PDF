@@ -7,11 +7,11 @@ Simple-PDF can be used through the browser on [https://richard-llmnn.github.io/S
 It is written in JavaScript and utilizes [pdf.js](https://mozilla.github.io/pdf.js/) and [pdf-lib](https://pdf-lib.js.org/).
 
 ## Developer Info
-| Command             | Documentation                                                               |
-|---------------------|-----------------------------------------------------------------------------|
-| yarn run build-dev  | Bundle the program with webpack in dev mode (sourcemaps, not minified, ...) |
-| yarn run build-prod | Bundle the program with webpack in prod mode (minified, ...)                |
-| yarn run serve      | Serve the program with webpacks webserver (automatic rebuilding)            |
+| Command            | Documentation                                                               |
+|--------------------|-----------------------------------------------------------------------------|
+| npm run build-dev  | Bundle the program with webpack in dev mode (sourcemaps, not minified, ...) |
+| npm run build-prod | Bundle the program with webpack in prod mode (minified, ...)                |
+| npm run serve      | Serve the program with webpacks webserver (automatic rebuilding)            |
 
 **Update Github-Pages:**
 
