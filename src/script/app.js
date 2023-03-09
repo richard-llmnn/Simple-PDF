@@ -2,14 +2,16 @@ import * as pdfjsLib from 'pdfjs-dist/webpack';
 import {PDFDocument} from "pdf-lib";
 import {Sortable} from "@shopify/draggable";
 import Dropzone from "dropzone";
+import {handlePdf, handlePng, handleJpeg} from "./fileHandlers";
 
 let pageCounter = 1;
 let pagesObject = {};
 let filesCounter = 1;
 let filesObject = {};
 
-// make html elements draggable
 const container = document.querySelector("#drag-area");
+
+// make html elements draggable
 const drag = new Sortable(container, {
     draggable: ".card-auto-size",
 })
@@ -19,56 +21,70 @@ let myDropzone = new Dropzone(
     {
         autoProcessQueue: false,
         url: "#",
-        acceptedFiles: ".pdf",
+        acceptedFiles: ".pdf,.jpg,.jpeg,.png",
         uploadMultiple: true,
         dictDefaultMessage: "Dateien zum Hochladen hier ablegen / Drop files here to upload"
     });
 
 myDropzone.on("addedfiles", async files => {
     for (const file of files) {
-        await processFile(file);
+        try {
+            await processFile(file);
+        } catch (e) {
+            alert(e.message)
+        }
     }
     myDropzone.removeAllFiles();
 })
 
-async function processFile(file){
+// is called for each uploaded file
+async function processFile(file) {
     //myDropzone.element.classList.add("d-none");
     myDropzone.emit("uploadprogress", file, 0)
-    if (file.type !== "application/pdf") {
-        myDropzone.removeFile(file);
-        alert("Keine PDF-Datein / Invalid PDF file!")
-        return;
+    switch (file.type) {
+        case "application/pdf":
+            filesObject[filesCounter] = await handlePdf(file);
+            break;
+        case "image/jpeg":
+            filesObject[filesCounter] = await handleJpeg(file);
+            break;
+        case "image/png":
+            filesObject[filesCounter] = await handlePng(file);
+            break;
+        default:
+            myDropzone.removeFile(file);
+            alert("Keine PDF-Datein / Invalid PDF file!")
+            return;
     }
-    filesObject[filesCounter] = await file.arrayBuffer();
 
     const pdfFile = filesObject[filesCounter];
-    const pdfDoc = await pdfjsLib.getDocument(pdfFile).promise
-    const pageAmount = await pdfDoc.numPages
-    for (let pageIndex = 1; pageIndex <= pageAmount; pageIndex++){
+    const pdfDoc = await pdfjsLib.getDocument(pdfFile).promise;
+    const pageAmount = await pdfDoc.numPages;
+    for (let pageIndex = 1; pageIndex <= pageAmount; pageIndex++) {
         myDropzone.emit("uploadprogress", file, Math.round(pageIndex / pageAmount * 100));
 
         const pdfPage = await pdfDoc.getPage(pageIndex);
         let pdfViewport = pdfPage.getViewport({scale: 1});
         let scale = 1;
-        if (pdfViewport.height > pdfViewport.width){
-            scale = 200/pdfViewport.height
+        if (pdfViewport.height > pdfViewport.width) {
+            scale = 200 / pdfViewport.height;
         } else {
-            scale = 200/pdfViewport.width
+            scale = 200 / pdfViewport.width;
         }
         pdfViewport = pdfPage.getViewport({scale});
-    
-    
+
+
         const canvas = document.createElement("canvas");
-        var context = canvas.getContext('2d');
+        const context = canvas.getContext('2d');
         canvas.height = pdfViewport.height;
         canvas.width = pdfViewport.width;
         canvas.classList.add("card-img-top");
-        
-        const card = template(pageCounter, ("name" in file)? file.name: null);
+
+        const card = template(pageCounter, ("name" in file) ? file.name : null);
         card.querySelector('.card-body').insertAdjacentElement("afterbegin", canvas);
 
         container.insertAdjacentElement("beforeend", card);
-    
+
         pdfPage.render({
             canvasContext: context,
             viewport: pdfViewport
@@ -82,9 +98,8 @@ async function processFile(file){
     filesCounter++;
 }
 
-window.removePage = function (pageID)
-{
-    const page = document.querySelector('div[data-page-id="'+pageID+'"]');
+window.removePage = function (pageID) {
+    const page = document.querySelector('div[data-page-id="' + pageID + '"]');
     if (page && confirm(`Seite ${pageID} entfernen? | Remove page ${pageID}?`) === true) {
         page.remove();
         delete pagesObject[pageID];
@@ -97,24 +112,22 @@ window.resetPage = function () {
     }
 }
 
-
-
 const template = (page, fileName = null) => {
     const container = document.createElement("span");
     container.innerHTML = `
         <div class="card card-auto-size" data-page-id="${page}">
             <div class="card-header bg-warning p-1 text-center"><b>${page}</b></div>
-            ${fileName !== null? `<div class="card-header bg-warning p-1 text-center">(${fileName})</div>`: ""}
+            ${fileName !== null ? `<div class="card-header bg-warning p-1 text-center">(${fileName})</div>` : ""}
             <div class="card-body p-0"></div>
             <div class="card-footer bg-danger p-0">
                 <button class="btn btn-danger w-100 m-0 p-3" onclick="removePage(${page})"><i class="gg-trash mx-auto"></i></button>
             </div>
-        </div>`;
+        </div>
+        `;
     return container.firstElementChild;
 }
 
-window.savePDF = async function ()
-{
+window.savePDF = async function () {
     // ask user for new file name
     let downloadFileName = prompt("[Dateiname/Filename].pdf");
     if (downloadFileName === null || downloadFileName === "" || downloadFileName.trim().length < 1) {
@@ -129,7 +142,7 @@ window.savePDF = async function ()
     for (const pageElement of pagesElements) {
         const pageId = pageElement.dataset.pageId
         const page = pagesObject[pageId]
-        if(!pdfDocumentCache.hasOwnProperty(page.pdfIndex)) {
+        if (!pdfDocumentCache.hasOwnProperty(page.pdfIndex)) {
             pdfDocumentCache[page.pdfIndex] = await PDFDocument.load(filesObject[page.pdfIndex]);
         }
         finalPDF.addPage((await finalPDF.copyPages(
