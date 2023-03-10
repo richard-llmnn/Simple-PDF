@@ -1,5 +1,5 @@
 import * as pdfjsLib from "pdfjs-dist/webpack";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, degrees } from "pdf-lib";
 import { Sortable } from "@shopify/draggable";
 import Dropzone from "dropzone";
 import { handlePdf, handlePng, handleJpeg } from "./fileHandlers";
@@ -15,6 +15,7 @@ const container = document.querySelector("#drag-area");
 // make html elements draggable
 const drag = new Sortable(container, {
   draggable: ".card-auto-size",
+  handle: ".card-body",
 });
 
 let myDropzone = new Dropzone("#dropzone", {
@@ -36,6 +37,26 @@ myDropzone.on("addedfiles", async (files) => {
   }
   myDropzone.removeAllFiles();
 });
+
+const template = (page, fileName = null) => {
+  const container = document.createElement("span");
+  container.innerHTML = `
+        <div class="card card-auto-size" data-page-id="${page}">
+            <div class="card-header bg-warning p-1 text-center"><b>${page}</b></div>
+            ${
+              fileName !== null
+                ? `<div class="card-header bg-warning p-1 text-center">(${fileName})</div>`
+                : ""
+            }
+            <div class="card-body p-0"></div>
+            <div class="card-footer p-0 d-flex">
+                <button class="btn btn-danger w-50 m-0 no-border-radius" onclick="removePage(${page})"><i class="gg-trash mx-auto"></i></button>
+                <button class="btn btn-info w-50 m-0 no-border-radius" onclick="rotatePage(${page})"><i class="gg-redo mx-auto"></i></button>
+            </div>
+        </div>
+        `;
+  return container.firstElementChild;
+};
 
 // is called for each uploaded file
 async function processFile(file) {
@@ -120,23 +141,51 @@ window.resetPage = function () {
   }
 };
 
-const template = (page, fileName = null) => {
-  const container = document.createElement("span");
-  container.innerHTML = `
-        <div class="card card-auto-size" data-page-id="${page}">
-            <div class="card-header bg-warning p-1 text-center"><b>${page}</b></div>
-            ${
-              fileName !== null
-                ? `<div class="card-header bg-warning p-1 text-center">(${fileName})</div>`
-                : ""
-            }
-            <div class="card-body p-0"></div>
-            <div class="card-footer bg-danger p-0">
-                <button class="btn btn-danger w-100 m-0 p-3" onclick="removePage(${page})"><i class="gg-trash mx-auto"></i></button>
-            </div>
-        </div>
-        `;
-  return container.firstElementChild;
+window.rotatePage = async function (pageID) {
+  let deg = prompt("Um wie viel Grad drehen?");
+  if (deg === null) return;
+  deg = parseInt(deg);
+  if (deg % 90 !== 0) {
+    alert("Deg must be 90, 180, 270");
+    return;
+  }
+
+  const pageElement = document.querySelector(
+    'div[data-page-id="' + pageID + '"]'
+  );
+  const pageInformation = pagesObject[pageID];
+  const pdfDocument = await PDFDocument.load(
+    filesObject[pageInformation.pdfIndex]
+  );
+  const page = pdfDocument.getPage(pageInformation.pageIndex - 1);
+  const newRotation = (page.getRotation().angle + deg) % 360;
+  page.setRotation(degrees(newRotation));
+  filesObject[pageInformation.pdfIndex] = (await pdfDocument.save()).buffer;
+
+  // rerender canvas
+  const pdfDoc = await pdfjsLib.getDocument(
+    copyArrayBuffer(filesObject[pageInformation.pdfIndex])
+  ).promise;
+  const pdfPage = await pdfDoc.getPage(pageInformation.pageIndex);
+  let pdfViewport = pdfPage.getViewport({ scale: 1 });
+  let scale = 1;
+  if (pdfViewport.height > pdfViewport.width) {
+    scale = 200 / pdfViewport.height;
+  } else {
+    scale = 200 / pdfViewport.width;
+  }
+
+  const canvas = pageElement.querySelector(".card-body canvas");
+  const context = canvas.getContext("2d");
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  pdfViewport = pdfPage.getViewport({ scale });
+  canvas.height = pdfViewport.height;
+  canvas.width = pdfViewport.width;
+
+  pdfPage.render({
+    canvasContext: context,
+    viewport: pdfViewport,
+  });
 };
 
 window.savePDF = async function () {
