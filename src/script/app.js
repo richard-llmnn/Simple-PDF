@@ -23,7 +23,7 @@ let myDropzone = new Dropzone("#dropzone", {
   acceptedFiles: ".pdf,.jpg,.jpeg,.png",
   uploadMultiple: true,
   dictDefaultMessage:
-    "Dateien zum Hochladen hier ablegen / Drop files here to upload",
+    "Dateien zum Hochladen hier ablegen / Drop files here to upload<br>( .pdf, .png, .jpg, .jpeg )",
 });
 
 myDropzone.on("addedfiles", async (files) => {
