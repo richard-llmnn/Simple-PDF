@@ -3,6 +3,7 @@ import {PDFDocument} from "pdf-lib";
 import {Sortable} from "@shopify/draggable";
 import Dropzone from "dropzone";
 import {handlePdf, handlePng, handleJpeg} from "./fileHandlers";
+import { copyArrayBuffer } from './helperFunctions';
 
 let pageCounter = 1;
 let pagesObject = {};
@@ -43,7 +44,7 @@ async function processFile(file) {
     myDropzone.emit("uploadprogress", file, 0)
     switch (file.type) {
         case "application/pdf":
-            filesObject[filesCounter] = await handlePdf(file);
+            filesObject[filesCounter] = (await handlePdf(file));
             break;
         case "image/jpeg":
             filesObject[filesCounter] = await handleJpeg(file);
@@ -53,12 +54,12 @@ async function processFile(file) {
             break;
         default:
             myDropzone.removeFile(file);
-            alert("Keine PDF-Datein / Invalid PDF file!")
+            alert("Keine PDF-Dateien / Invalid PDF file!")
             return;
     }
 
     const pdfFile = filesObject[filesCounter];
-    const pdfDoc = await pdfjsLib.getDocument(pdfFile).promise;
+    const pdfDoc = await pdfjsLib.getDocument(copyArrayBuffer(pdfFile)).promise;
     const pageAmount = await pdfDoc.numPages;
     for (let pageIndex = 1; pageIndex <= pageAmount; pageIndex++) {
         myDropzone.emit("uploadprogress", file, Math.round(pageIndex / pageAmount * 100));
@@ -151,7 +152,7 @@ window.savePDF = async function () {
         ))[0])
     }
 
-    // generate and downlaod blob
+    // generate and download blob
     const pdf = new Blob([await finalPDF.save()], {
         type: "application/pdf"
     })
