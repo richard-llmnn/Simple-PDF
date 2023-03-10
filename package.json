@@ -22,11 +22,12 @@
     "dropzone": "^6.0.0-beta.2",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^3.4.120",
-    "worker-loader": "^3.0.8"
+    "prettier": "^2.8.4"
   },
   "scripts": {
     "build-dev": "webpack build",
     "build-prod": "webpack build --mode='production'",
-    "serve": "webpack serve"
+    "serve": "webpack serve",
+    "format":  "prettier --write src/"
   }
 }
