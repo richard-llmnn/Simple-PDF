@@ -3,6 +3,7 @@ import {PDFDocument} from "pdf-lib";
 import {Sortable} from "@shopify/draggable";
 import Dropzone from "dropzone";
 import {handlePdf, handlePng, handleJpeg} from "./fileHandlers";
+import { copyArrayBuffer } from './helperFunctions';
 
 let pageCounter = 1;
 let pagesObject = {};
@@ -34,7 +35,6 @@ myDropzone.on("addedfiles", async files => {
             alert(e.message)
         }
     }
-    console.log(filesObject)
     myDropzone.removeAllFiles();
 })
 
@@ -54,13 +54,12 @@ async function processFile(file) {
             break;
         default:
             myDropzone.removeFile(file);
-            alert("Keine PDF-Datein / Invalid PDF file!")
+            alert("Keine PDF-Dateien / Invalid PDF file!")
             return;
     }
 
     const pdfFile = filesObject[filesCounter];
-    console.dir(filesObject[filesCounter], pdfFile)
-    const pdfDoc = await pdfjsLib.getDocument(pdfFile).promise;
+    const pdfDoc = await pdfjsLib.getDocument(copyArrayBuffer(pdfFile)).promise;
     const pageAmount = await pdfDoc.numPages;
     for (let pageIndex = 1; pageIndex <= pageAmount; pageIndex++) {
         myDropzone.emit("uploadprogress", file, Math.round(pageIndex / pageAmount * 100));
@@ -141,12 +140,10 @@ window.savePDF = async function () {
     const pdfDocumentCache = {};
     const finalPDF = await PDFDocument.create();
     const pagesElements = document.querySelector("#drag-area").querySelectorAll("div[data-page-id]");
-    console.log(filesObject)
     for (const pageElement of pagesElements) {
         const pageId = pageElement.dataset.pageId
         const page = pagesObject[pageId]
         if (!pdfDocumentCache.hasOwnProperty(page.pdfIndex)) {
-            console.log(page.pdfIndex)
             pdfDocumentCache[page.pdfIndex] = await PDFDocument.load(filesObject[page.pdfIndex]);
         }
         finalPDF.addPage((await finalPDF.copyPages(
@@ -155,7 +152,7 @@ window.savePDF = async function () {
         ))[0])
     }
 
-    // generate and downlaod blob
+    // generate and download blob
     const pdf = new Blob([await finalPDF.save()], {
         type: "application/pdf"
     })
