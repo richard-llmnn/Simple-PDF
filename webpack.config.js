@@ -31,7 +31,7 @@ module.exports = {
         new MiniCssExtractPlugin(),
         new HtmlWebpackPlugin({
             template: path.join(__dirname, "src/app.html"),
-            inject: "head", // if is set to "body", "head" or true you have to remove the webpack tags from the template!
+            inject: "body", // if is set to "body", "head" or true you have to remove the webpack tags from the template!
             favicon: false, // do not user favicon, because we set multiple icons in the template
             hash: false,
             minify: false

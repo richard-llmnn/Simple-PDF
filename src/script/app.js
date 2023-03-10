@@ -34,6 +34,7 @@ myDropzone.on("addedfiles", async files => {
             alert(e.message)
         }
     }
+    console.log(filesObject)
     myDropzone.removeAllFiles();
 })
 
@@ -43,7 +44,7 @@ async function processFile(file) {
     myDropzone.emit("uploadprogress", file, 0)
     switch (file.type) {
         case "application/pdf":
-            filesObject[filesCounter] = await handlePdf(file);
+            filesObject[filesCounter] = (await handlePdf(file));
             break;
         case "image/jpeg":
             filesObject[filesCounter] = await handleJpeg(file);
@@ -58,6 +59,7 @@ async function processFile(file) {
     }
 
     const pdfFile = filesObject[filesCounter];
+    console.dir(filesObject[filesCounter], pdfFile)
     const pdfDoc = await pdfjsLib.getDocument(pdfFile).promise;
     const pageAmount = await pdfDoc.numPages;
     for (let pageIndex = 1; pageIndex <= pageAmount; pageIndex++) {
@@ -139,10 +141,12 @@ window.savePDF = async function () {
     const pdfDocumentCache = {};
     const finalPDF = await PDFDocument.create();
     const pagesElements = document.querySelector("#drag-area").querySelectorAll("div[data-page-id]");
+    console.log(filesObject)
     for (const pageElement of pagesElements) {
         const pageId = pageElement.dataset.pageId
         const page = pagesObject[pageId]
         if (!pdfDocumentCache.hasOwnProperty(page.pdfIndex)) {
+            console.log(page.pdfIndex)
             pdfDocumentCache[page.pdfIndex] = await PDFDocument.load(filesObject[page.pdfIndex]);
         }
         finalPDF.addPage((await finalPDF.copyPages(
