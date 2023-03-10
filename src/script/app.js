@@ -159,8 +159,10 @@ window.savePDF = async function () {
 
     let link = document.createElement("a");
     link.download = downloadFileName + ".pdf";
-    link.href = URL.createObjectURL(pdf);
+    const objectUrl = URL.createObjectURL(pdf);
+    link.href = objectUrl;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(objectUrl)
 }
