@@ -3,14 +3,17 @@
 @forward "dropzone/src/dropzone";
 
 .card-auto-size {
-  max-width: 13rem;
-  width: 20vw;
-  min-width: 7rem;
+  width: 250px;
+  box-sizing: content-box;
+  .card-body {
+    canvas {
+      cursor: grab;
+    }
+  }
 }
 
 .draggable--over {
-  border: 0.5rem dotted red;
-  transition: 0.125s ease-in-out;
+  outline: 0.4rem dotted red;
 }
 
 .no-border-radius {
