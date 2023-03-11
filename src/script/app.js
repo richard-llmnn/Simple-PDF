@@ -76,7 +76,7 @@ async function processFile(file) {
       break;
     default:
       myDropzone.removeFile(file);
-      alert("Keine PDF-Dateien / Invalid PDF file!");
+      alert("Keine PDF-Dateien! | Invalid PDF file!");
       return;
   }
 
@@ -121,7 +121,7 @@ window.removePage = function (pageID) {
 };
 
 window.resetPage = function () {
-  if (confirm("Zurücksetzen/Reset?")) {
+  if (confirm("Zurücksetzen? | Reset?")) {
     location.reload();
   }
 };
@@ -157,7 +157,7 @@ window.savePDF = async function () {
     downloadFileName === "" ||
     downloadFileName.trim().length < 1
   ) {
-    alert("Dateiname nicht gültig! / Filename not valid!");
+    alert("Dateiname nicht gültig! | Filename not valid!");
     return;
   }
 
