@@ -45,14 +45,14 @@ async function renderPdfToCanvas(canvas, arrayBuffer, pageId) {
   context.clearRect(0, 0, canvas.width, canvas.height);
   const pdfViewport = pdfPage.getViewport({ scale });
   canvas.height = pdfViewport.height;
-  canvas.style.height = pdfViewport.height+"px";
+  canvas.style.height = pdfViewport.height + "px";
   canvas.width = pdfViewport.width;
-  canvas.style.width = pdfViewport.width+"px";
+  canvas.style.width = pdfViewport.width + "px";
 
   pdfPage.render({
     canvasContext: context,
-    viewport: pdfViewport
+    viewport: pdfViewport,
   });
 }
 
-export { getHeightAndWidthFromImage, copyArrayBuffer, renderPdfToCanvas};
+export { getHeightAndWidthFromImage, copyArrayBuffer, renderPdfToCanvas };

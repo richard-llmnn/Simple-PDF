@@ -3,7 +3,7 @@ import { PDFDocument, degrees } from "pdf-lib";
 import { Sortable } from "@shopify/draggable";
 import Dropzone from "dropzone";
 import { handlePdf, handlePng, handleJpeg } from "./fileHandlers";
-import {copyArrayBuffer, renderPdfToCanvas} from "./helperFunctions";
+import { copyArrayBuffer, renderPdfToCanvas } from "./helperFunctions";
 
 let pageCounter = 1;
 let pagesObject = {};
@@ -95,9 +95,9 @@ async function processFile(file) {
     container.insertAdjacentElement("beforeend", card);
 
     renderPdfToCanvas(
-        card.querySelector(".card-body canvas"),
-        copyArrayBuffer(pdfFile),
-        pageIndex
+      card.querySelector(".card-body canvas"),
+      copyArrayBuffer(pdfFile),
+      pageIndex
     );
 
     pagesObject[pageCounter] = {
@@ -127,10 +127,14 @@ window.resetPage = function () {
 };
 
 window.rotatePage = async function (pageID) {
-  const pageElement = document.querySelector('div[data-page-id="' + pageID + '"]');
+  const pageElement = document.querySelector(
+    'div[data-page-id="' + pageID + '"]'
+  );
   // load pdf file and get page
   const pageInformation = pagesObject[pageID];
-  const pdfDocument = await PDFDocument.load(filesObject[pageInformation.pdfIndex]);
+  const pdfDocument = await PDFDocument.load(
+    filesObject[pageInformation.pdfIndex]
+  );
   const page = pdfDocument.getPage(pageInformation.pageIndex - 1);
   // add 90 degrees
   const newRotationAngle = (page.getRotation().angle + 90) % 360;
@@ -140,12 +144,13 @@ window.rotatePage = async function (pageID) {
 
   // rerender canvas
   renderPdfToCanvas(
-      pageElement.querySelector(".card-body canvas"),
-      copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
-      pageInformation.pageIndex
-      )
-      .then(() => {
-        alert(`Seite ${pageID} wurde erfolgreich gedreht | Page ${pageID} was successfully rotated`)
+    pageElement.querySelector(".card-body canvas"),
+    copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
+    pageInformation.pageIndex
+  ).then(() => {
+    alert(
+      `Seite ${pageID} wurde erfolgreich gedreht | Page ${pageID} was successfully rotated`
+    );
   });
 };
 
