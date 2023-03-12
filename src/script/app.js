@@ -1,9 +1,9 @@
 import * as pdfjsLib from "pdfjs-dist/webpack";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, degrees } from "pdf-lib";
 import { Sortable } from "@shopify/draggable";
 import Dropzone from "dropzone";
 import { handlePdf, handlePng, handleJpeg } from "./fileHandlers";
-import { copyArrayBuffer } from "./helperFunctions";
+import { copyArrayBuffer, renderPdfToCanvas } from "./helperFunctions";
 
 let pageCounter = 1;
 let pagesObject = {};
@@ -15,6 +15,7 @@ const container = document.querySelector("#drag-area");
 // make html elements draggable
 const drag = new Sortable(container, {
   draggable: ".card-auto-size",
+  handle: ".card-body",
 });
 
 let myDropzone = new Dropzone("#dropzone", {
@@ -37,6 +38,28 @@ myDropzone.on("addedfiles", async (files) => {
   myDropzone.removeAllFiles();
 });
 
+const template = (page, fileName = null) => {
+  const container = document.createElement("span");
+  container.innerHTML = `
+        <div class="card card-auto-size" data-page-id="${page}">
+            <div class="card-header bg-warning p-1 text-center user-select-none"><b>${page}</b></div>
+            ${
+              fileName !== null
+                ? `<div class="card-header bg-warning p-1 text-center">(${fileName})</div>`
+                : ""
+            }
+            <div class="card-body p-0 d-flex justify-content-center align-items-center bg-black">
+                <canvas class="d-block"></canvas>
+            </div>
+            <div class="card-footer p-0 d-flex">
+                <button class="btn btn-danger w-50 m-0 no-border-radius" onclick="removePage(${page})"><i class="gg-trash mx-auto"></i></button>
+                <button class="btn btn-info w-50 m-0 no-border-radius" onclick="rotatePage(${page})"><i class="gg-redo mx-auto"></i></button>
+            </div>
+        </div>
+        `;
+  return container.firstElementChild;
+};
+
 // is called for each uploaded file
 async function processFile(file) {
   //myDropzone.element.classList.add("d-none");
@@ -53,13 +76,14 @@ async function processFile(file) {
       break;
     default:
       myDropzone.removeFile(file);
-      alert("Keine PDF-Dateien / Invalid PDF file!");
+      alert("Keine PDF-Dateien! | Invalid PDF file!");
       return;
   }
 
   const pdfFile = filesObject[filesCounter];
-  const pdfDoc = await pdfjsLib.getDocument(copyArrayBuffer(pdfFile)).promise;
+  let pdfDoc = await pdfjsLib.getDocument(copyArrayBuffer(pdfFile)).promise;
   const pageAmount = await pdfDoc.numPages;
+  pdfDoc = undefined;
   for (let pageIndex = 1; pageIndex <= pageAmount; pageIndex++) {
     myDropzone.emit(
       "uploadprogress",
@@ -67,33 +91,15 @@ async function processFile(file) {
       Math.round((pageIndex / pageAmount) * 100)
     );
 
-    const pdfPage = await pdfDoc.getPage(pageIndex);
-    let pdfViewport = pdfPage.getViewport({ scale: 1 });
-    let scale = 1;
-    if (pdfViewport.height > pdfViewport.width) {
-      scale = 200 / pdfViewport.height;
-    } else {
-      scale = 200 / pdfViewport.width;
-    }
-    pdfViewport = pdfPage.getViewport({ scale });
-
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    canvas.height = pdfViewport.height;
-    canvas.width = pdfViewport.width;
-    canvas.classList.add("card-img-top");
-
     const card = template(pageCounter, "name" in file ? file.name : null);
-    card
-      .querySelector(".card-body")
-      .insertAdjacentElement("afterbegin", canvas);
-
     container.insertAdjacentElement("beforeend", card);
 
-    pdfPage.render({
-      canvasContext: context,
-      viewport: pdfViewport,
-    });
+    renderPdfToCanvas(
+      card.querySelector(".card-body canvas"),
+      copyArrayBuffer(pdfFile),
+      pageIndex
+    );
+
     pagesObject[pageCounter] = {
       pageIndex: pageIndex,
       pdfIndex: filesCounter,
@@ -115,28 +121,37 @@ window.removePage = function (pageID) {
 };
 
 window.resetPage = function () {
-  if (confirm("Zurücksetzen/Reset?")) {
+  if (confirm("Zurücksetzen? | Reset?")) {
     location.reload();
   }
 };
 
-const template = (page, fileName = null) => {
-  const container = document.createElement("span");
-  container.innerHTML = `
-        <div class="card card-auto-size" data-page-id="${page}">
-            <div class="card-header bg-warning p-1 text-center"><b>${page}</b></div>
-            ${
-              fileName !== null
-                ? `<div class="card-header bg-warning p-1 text-center">(${fileName})</div>`
-                : ""
-            }
-            <div class="card-body p-0"></div>
-            <div class="card-footer bg-danger p-0">
-                <button class="btn btn-danger w-100 m-0 p-3" onclick="removePage(${page})"><i class="gg-trash mx-auto"></i></button>
-            </div>
-        </div>
-        `;
-  return container.firstElementChild;
+window.rotatePage = async function (pageID) {
+  const pageElement = document.querySelector(
+    'div[data-page-id="' + pageID + '"]'
+  );
+  // load pdf file and get page
+  const pageInformation = pagesObject[pageID];
+  const pdfDocument = await PDFDocument.load(
+    filesObject[pageInformation.pdfIndex]
+  );
+  const page = pdfDocument.getPage(pageInformation.pageIndex - 1);
+  // add 90 degrees
+  const newRotationAngle = (page.getRotation().angle + 90) % 360;
+  page.setRotation(degrees(newRotationAngle));
+  // save new pdf file as array buffer
+  filesObject[pageInformation.pdfIndex] = (await pdfDocument.save()).buffer;
+
+  // rerender canvas
+  renderPdfToCanvas(
+    pageElement.querySelector(".card-body canvas"),
+    copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
+    pageInformation.pageIndex
+  ).then(() => {
+    alert(
+      `Seite ${pageID} wurde erfolgreich gedreht | Page ${pageID} was successfully rotated`
+    );
+  });
 };
 
 window.savePDF = async function () {
@@ -147,7 +162,7 @@ window.savePDF = async function () {
     downloadFileName === "" ||
     downloadFileName.trim().length < 1
   ) {
-    alert("Dateiname nicht gültig! / Filename not valid!");
+    alert("Dateiname nicht gültig! | Filename not valid!");
     return;
   }
 
