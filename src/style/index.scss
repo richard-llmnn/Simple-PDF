@@ -3,30 +3,30 @@
 @forward "dropzone/src/dropzone";
 
 .card-auto-size {
-  width: 250px;
-  box-sizing: content-box;
-  .card-body {
-    cursor: grab;
-  }
+    width: 250px;
+    box-sizing: content-box;
+    .card-body {
+        cursor: grab;
+    }
 }
 
 .draggable--over {
-  outline: 0.4rem dotted red;
+    outline: 0.4rem dotted red;
 }
 
 .draggable--is-dragging,
 .draggable--is-dragging * {
-  cursor: grabbing !important;
+    cursor: grabbing !important;
 }
 
 .no-border-radius {
-  border-radius: 0;
+    border-radius: 0;
 }
 
 .modal-body .single-page-canvas {
-  &:active,
-  &:hover,
-  &:focus {
-    outline: 1px black solid;
-  }
+    &:active,
+    &:hover,
+    &:focus {
+        outline: 1px black solid;
+    }
 }

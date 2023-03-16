@@ -16,8 +16,6 @@ let filesCounter = 1;
 let filesObject = {};
 let previewScale = 1;
 
-
-
 // make html elements draggable
 const drag = new Sortable(container, {
     draggable: ".card-auto-size",
@@ -70,7 +68,6 @@ const templateHr = (content) => {
         `;
     return container.firstElementChild;
 };
-
 
 // is called for each uploaded file
 async function processFile(file) {
@@ -163,7 +160,7 @@ async function getFinalArrayBuffer() {
         finalPDF.addPage((await finalPDF.copyPages(pdfDocumentCache[page.pdfIndex], [page.pageIndex - 1]))[0]);
     }
 
-    return await finalPDF.save({addDefaultPage: false});
+    return await finalPDF.save({ addDefaultPage: false });
 }
 
 window.savePDF = async function () {
@@ -193,49 +190,48 @@ window.savePDF = async function () {
  * @param button HTMLElement
  * @returns {Promise<void>}
  */
-window.previewPDF = async function() {
+window.previewPDF = async function () {
     const modalElement = document.querySelector(previewModelSelector);
-    const modalBody = modalElement.querySelector('.modal-body')
+    const modalBody = modalElement.querySelector(".modal-body");
     modalBody.innerHTML = null; // clear modal
     const pdfObject = await pdfjsLib.getDocument(await getFinalArrayBuffer()).promise;
 
     for (let pageId = 1; pageId <= pdfObject.numPages; pageId++) {
-        const page = await pdfObject.getPage(pageId)
-        const viewport = page.getViewport({scale: previewScale});
+        const page = await pdfObject.getPage(pageId);
+        const viewport = page.getViewport({ scale: previewScale });
 
-        const canvas = document.createElement("canvas")
-        const canvasContext = canvas.getContext("2d")
+        const canvas = document.createElement("canvas");
+        const canvasContext = canvas.getContext("2d");
         canvas.width = viewport.width;
-        canvas.height = viewport.height
-        canvas.classList.add("single-page-canvas", "mx-auto")
-        modalBody.appendChild(templateHr(pageId))
-        modalBody.appendChild(canvas)
+        canvas.height = viewport.height;
+        canvas.classList.add("single-page-canvas", "mx-auto");
+        modalBody.appendChild(templateHr(pageId));
+        modalBody.appendChild(canvas);
 
         const renderContext = {
             canvasContext,
-            viewport
-        }
-        page.render(renderContext)
+            viewport,
+        };
+        page.render(renderContext);
     }
-}
+};
 
-window.previewPDFZoomIn = function(button) {
-    toggleZoomButtons()
-    if (previewScale < 5) previewScale += 0.1
+window.previewPDFZoomIn = function (button) {
+    toggleZoomButtons();
+    if (previewScale < 5) previewScale += 0.1;
     previewPDF().then(() => {
-        toggleZoomButtons()
-    })
-}
+        toggleZoomButtons();
+    });
+};
 
-
-window.previewPDFZoomOut = function(button) {
-    toggleZoomButtons()
-    if (previewScale > 0.1) previewScale -= 0.1
+window.previewPDFZoomOut = function (button) {
+    toggleZoomButtons();
+    if (previewScale > 0.1) previewScale -= 0.1;
     previewPDF().then(() => {
-        toggleZoomButtons()
-    })
-}
+        toggleZoomButtons();
+    });
+};
 function toggleZoomButtons() {
-    previewZoomIntBtn.disabled = !previewZoomOutBtn.disabled
-    previewZoomOutBtn.disabled = !previewZoomOutBtn.disabled
+    previewZoomIntBtn.disabled = !previewZoomOutBtn.disabled;
+    previewZoomOutBtn.disabled = !previewZoomOutBtn.disabled;
 }
