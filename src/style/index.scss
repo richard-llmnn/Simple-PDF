@@ -22,3 +22,11 @@
 .no-border-radius {
   border-radius: 0;
 }
+
+.modal-body .single-page-canvas {
+  &:active,
+  &:hover,
+  &:focus {
+    outline: 1px black solid;
+  }
+}

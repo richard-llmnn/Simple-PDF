@@ -27,7 +27,7 @@ async function renderPdfToCanvas(canvas, arrayBuffer, pageId) {
   const pdfDoc = await pdfjsLib.getDocument(arrayBuffer).promise; // array buffer(file) to object
   const pdfPage = await pdfDoc.getPage(pageId); // get specific page from file
   let pdfViewportOriginal = pdfPage.getViewport({ scale: 1 });
-  let scale;
+  let scale = 1;
 
   let pdfWidth = pdfViewportOriginal.width;
   let pdfHeight = pdfViewportOriginal.height;
