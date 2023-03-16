@@ -190,6 +190,7 @@ window.savePDF = async function () {
 window.previewPDF = async function(button) {
     const modalElement = document.querySelector(button.dataset.bsTarget);
     const modalBody = modalElement.querySelector('.modal-body')
+    modalBody.innerHTML = null; // clear modal
     const pdfObject = await pdfjsLib.getDocument(await getFinalArrayBuffer()).promise;
 
     for (let pageId = 1; pageId <= pdfObject.numPages; pageId++) {
