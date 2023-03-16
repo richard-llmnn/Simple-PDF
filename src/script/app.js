@@ -1,9 +1,10 @@
 import * as pdfjsLib from "pdfjs-dist/webpack";
-import { PDFDocument, degrees } from "pdf-lib";
+import { PDFDocument, degrees, PageSizes } from "pdf-lib";
 import { Sortable } from "@shopify/draggable";
 import Dropzone from "dropzone";
 import { handlePdf, handlePng, handleJpeg } from "./fileHandlers";
 import { copyArrayBuffer, renderPdfToCanvas } from "./helperFunctions";
+import { Modal } from "bootstrap";
 
 const previewModelSelector = "#previewModal";
 const previewZoomIntBtn = document.getElementById("preview-zoom-int-btn");
@@ -50,9 +51,10 @@ const template = (page, fileName = null) => {
             <div class="card-body p-0 d-flex justify-content-center align-items-center bg-black">
                 <canvas class="d-block"></canvas>
             </div>
-            <div class="card-footer p-0 d-flex">
-                <button class="btn btn-danger w-50 m-0 no-border-radius" onclick="removePage(${page})"><i class="gg-trash mx-auto"></i></button>
-                <button class="btn btn-info w-50 m-0 no-border-radius" onclick="rotatePage(${page})"><i class="gg-redo mx-auto"></i></button>
+            <div class="card-footer p-0 d-flex align-items-stretch">
+                <button class="btn btn-danger m-0 no-border-radius flex-grow-1" onclick="removePage(${page})"><i class="gg-trash mx-auto"></i></button>
+                <button class="btn btn-info m-0 no-border-radius flex-grow-1" onclick="rotatePage(${page})"><i class="gg-redo mx-auto"></i></button>
+                <button class="btn btn-warning m-0 no-border-radius flex-grow-1" onclick="resizePage(${page})"><i class="gg-expand mx-auto"></i></button>
             </div>
         </div>
         `;
@@ -162,6 +164,36 @@ async function getFinalArrayBuffer() {
 
     return await finalPDF.save({ addDefaultPage: false });
 }
+
+window.resizePage = async function (pageID) {
+    const pageInformation = pagesObject[pageID];
+    const pdfDocument = await PDFDocument.load(filesObject[pageInformation.pdfIndex]);
+    const page = pdfDocument.getPage(pageInformation.pageIndex - 1);
+    const modalElement = document.getElementById("resizeModal");
+    const myModal = new Modal(modalElement);
+    myModal.show();
+    const select = document.querySelectorAll("#resizeModal select");
+    select.forEach((select, index) => {
+        if (select.length < 2) {
+            Object.entries(PageSizes).forEach(([size, measurement]) => {
+                const option = document.createElement("option");
+                option.value = size;
+                option.innerText = `${size} (${measurement[index]}pt)`;
+                select.appendChild(option);
+            });
+        }
+    });
+
+    const widthElement = document.querySelector("#resizeModal #width");
+    const heightElement = document.querySelector("#resizeModal #height");
+    const pageSize = page.getSize();
+    widthElement.value = pageSize.width;
+    heightElement.value = pageSize.height;
+    const closeModalElement = document.getElementById("resizeModalClose");
+    closeModalElement.addEventListener("click", () => {
+        console.log(PageSizes[select.value]);
+    });
+};
 
 window.savePDF = async function () {
     // ask user for new file name

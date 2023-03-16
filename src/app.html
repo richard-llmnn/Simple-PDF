@@ -56,5 +56,51 @@
                 </div>
             </div>
         </div>
+
+        <!-- Resize modal -->
+        <div class="modal modal-lg fade" id="resizeModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Größe anpassen/Resize</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex gap-2">
+                            <div class="form-outline">
+                                <div class="input-group mb-3">
+                                    <button class="btn btn-outline-secondary">Breite/Width</button>
+                                    <select class="form-select"></select>
+                                    <input type="number" class="form-control" id="width" />
+                                </div>
+                                <div class="input-group mb-3">
+                                    <button class="btn btn-outline-secondary">Höhe/Height</button>
+                                    <select class="form-select"></select>
+                                    <input type="number" class="form-control" id="height" />
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column justify-content-evenly">
+                                <i class="gg-corner-double-up-left mx-auto"></i>
+                                <input type="checkbox" />
+                                <i
+                                    class="gg-corner-double-up-left mx-auto"
+                                    style="transform: rotate(180deg) scaleX(-1)"
+                                ></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-success mx-auto"
+                            data-bs-dismiss="modal"
+                            id="resizeModalClose"
+                        >
+                            Speichern/Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
