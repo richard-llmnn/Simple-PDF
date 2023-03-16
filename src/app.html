@@ -12,7 +12,7 @@
         <button class="btn btn-success" onclick="savePDF()">
           Speichern/Save
         </button>
-        <button class="btn btn-warning" onclick="previewPDF(this)" data-bs-toggle="modal" data-bs-target="#previewModal">
+        <button class="btn btn-warning" onclick="previewPDF()" data-bs-toggle="modal" data-bs-target="#previewModal">
             Vorschau/Preview
         </button>
         <button class="btn btn-danger" onclick="resetPage()">
@@ -43,9 +43,11 @@
             <h1 class="modal-title fs-5" id="staticBackdropLabel">Vorschau/Preview</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body d-flex flex-column align-items-center p-0"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary mx-auto" data-bs-dismiss="modal">Schließen/Close</button>
+          <div class="modal-body d-flex flex-column align-items-start p-1"></div>
+          <div class="modal-footer d-flex justify-content-around flex-column flex-sm-row gap-2 align-items-stretch">
+            <button class="btn btn-warning" id="preview-zoom-int-btn" onclick="previewPDFZoomIn(this)"><i class="gg-zoom-in mx-auto"></i></button>
+            <button class="btn btn-warning" id="preview-zoom-out-btn" onclick="previewPDFZoomOut(this)"><i class="gg-zoom-out mx-auto"></i></button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Schließen/Close</button>
           </div>
         </div>
       </div>

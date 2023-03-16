@@ -5,12 +5,18 @@ import Dropzone from "dropzone";
 import { handlePdf, handlePng, handleJpeg } from "./fileHandlers";
 import { copyArrayBuffer, renderPdfToCanvas } from "./helperFunctions";
 
+const previewModelSelector = "#previewModal";
+const previewZoomIntBtn = document.getElementById("preview-zoom-int-btn");
+const previewZoomOutBtn = document.getElementById("preview-zoom-out-btn");
+const container = document.querySelector("#drag-area");
+
 let pageCounter = 1;
 let pagesObject = {};
 let filesCounter = 1;
 let filesObject = {};
+let previewScale = 1;
 
-const container = document.querySelector("#drag-area");
+
 
 // make html elements draggable
 const drag = new Sortable(container, {
@@ -58,7 +64,7 @@ const template = (page, fileName = null) => {
 const templateHr = (content) => {
     const container = document.createElement("span");
     container.innerHTML = `
-        <div class="align-items-center d-flex w-100 gap-1">
+        <div class="align-items-center d-flex w-100 gap-1 user-select-none">
             <hr class="flex-grow-1"><b>${content}</b><hr class="flex-grow-1">
         </div>
         `;
@@ -187,21 +193,21 @@ window.savePDF = async function () {
  * @param button HTMLElement
  * @returns {Promise<void>}
  */
-window.previewPDF = async function(button) {
-    const modalElement = document.querySelector(button.dataset.bsTarget);
+window.previewPDF = async function() {
+    const modalElement = document.querySelector(previewModelSelector);
     const modalBody = modalElement.querySelector('.modal-body')
     modalBody.innerHTML = null; // clear modal
     const pdfObject = await pdfjsLib.getDocument(await getFinalArrayBuffer()).promise;
 
     for (let pageId = 1; pageId <= pdfObject.numPages; pageId++) {
         const page = await pdfObject.getPage(pageId)
-        const viewport = page.getViewport({scale: 1});
+        const viewport = page.getViewport({scale: previewScale});
 
         const canvas = document.createElement("canvas")
         const canvasContext = canvas.getContext("2d")
         canvas.width = viewport.width;
         canvas.height = viewport.height
-        canvas.classList.add("single-page-canvas")
+        canvas.classList.add("single-page-canvas", "mx-auto")
         modalBody.appendChild(templateHr(pageId))
         modalBody.appendChild(canvas)
 
@@ -211,4 +217,25 @@ window.previewPDF = async function(button) {
         }
         page.render(renderContext)
     }
+}
+
+window.previewPDFZoomIn = function(button) {
+    toggleZoomButtons()
+    if (previewScale < 5) previewScale += 0.1
+    previewPDF().then(() => {
+        toggleZoomButtons()
+    })
+}
+
+
+window.previewPDFZoomOut = function(button) {
+    toggleZoomButtons()
+    if (previewScale > 0.1) previewScale -= 0.1
+    previewPDF().then(() => {
+        toggleZoomButtons()
+    })
+}
+function toggleZoomButtons() {
+    previewZoomIntBtn.disabled = !previewZoomOutBtn.disabled
+    previewZoomOutBtn.disabled = !previewZoomOutBtn.disabled
 }
