@@ -15,14 +15,14 @@ It is written in JavaScript and utilizes [pdf.js](https://mozilla.github.io/pdf.
 | npm run build-prod | Bundle the program with webpack in prod mode (minified, ...)               |
 | npm run serve      | Serve the program with webpacks webserver (automatic rebuilding)           |
 | npm run format     | Format source files in `src/` directory with prettier                      |
+| npm run deploy     | Deploy current version of branch `master` to github pages                  |
 
 **Update Github-Pages:**
 
-1. Build the program in branch `master` in mode `production`
-2. Switch to `gh-pages` branch
-3. Remove old website files
-4. Paste the currently generated files from the `dist` folder to the git-root
-5. Commit and push
+1. Checkout to branch `master`
+2. Set new version in `package.json` file
+2. Commit and push updated `package.json` file
+3. Run `npm run deploy`
 
 ## Used Libraries
 - https://getbootstrap.com/docs/5.0/getting-started/introduction/
