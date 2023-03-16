@@ -28,6 +28,6 @@
     "build-dev": "webpack build",
     "build-prod": "webpack build --mode='production'",
     "serve": "webpack serve",
-    "format":  "prettier --write src/"
+    "format":  "prettier --print-width=120  --tab-width=4 --write src/"
   }
 }
