@@ -23,7 +23,7 @@
     "dropzone": "^6.0.0-beta.2",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^3.4.120",
-    "prettier": "^2.8.4"
+    "prettier": "^2.8.5"
   },
   "scripts": {
     "build-dev": "webpack build",
