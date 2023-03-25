@@ -123,7 +123,7 @@ window.removePage = function (pageID) {
     const page = document.querySelector('div[data-page-id="' + pageID + '"]');
     if (page && confirm(`Seite ${pageID} entfernen? | Remove page ${pageID}?`) === true) {
         page.remove();
-        delete originalSizesObject[pageID]
+        delete originalSizesObject[pageID];
         delete pagesObject[pageID];
     }
 };
@@ -178,7 +178,7 @@ window.resizePage = function (pageID) {
     const myModal = new Modal(modalElement);
     myModal.show();
 
-    const resizeSetup = async (reset=false) => {
+    const resizeSetup = async (reset = false) => {
         const pageInformation = pagesObject[pageID];
         const pdfDocument = await PDFDocument.load(filesObject[pageInformation.pdfIndex]);
         const page = pdfDocument.getPage(pageInformation.pageIndex - 1);
@@ -188,12 +188,12 @@ window.resizePage = function (pageID) {
         const widthElement = document.querySelector("#resizeModal #width");
         const heightElement = document.querySelector("#resizeModal #height");
         let pageSize;
-        if (!reset){
+        if (!reset) {
             pageSize = page.getSize();
         } else {
-            pageSize = originalSizesObject[pageID]
+            pageSize = originalSizesObject[pageID];
         }
-        
+
         widthElement.value = pageSize.width.toFixed(2);
         heightElement.value = pageSize.height.toFixed(2);
 
@@ -230,7 +230,14 @@ window.resizePage = function (pageID) {
             }
         };
 
-        select.onchange = () => {
+        select.onmouseup = function () {
+            selectChange();
+        };
+        select.onkeyup = function (ev) {
+            selectChange();
+        };
+
+        const selectChange = () => {
             if (!select.value) return;
             aspectRatio = widthElement.value / heightElement.value;
             widthElement.value = PageSizes[select.value][0];
@@ -240,6 +247,7 @@ window.resizePage = function (pageID) {
                 heightElement.value = PageSizes[select.value][1];
             }
         };
+        selectChange();
 
         const closeModalElement = document.querySelector("#resizeModalClose");
         closeModalElement.onclick = async () => {
