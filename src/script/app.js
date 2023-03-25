@@ -3,8 +3,9 @@ import { PDFDocument, degrees, PageSizes } from "pdf-lib";
 import { Sortable } from "@shopify/draggable";
 import Dropzone from "dropzone";
 import { handlePdf, handlePng, handleJpeg } from "./fileHandlers";
-import { copyArrayBuffer, renderPdfToCanvas } from "./helperFunctions";
+import { copyArrayBuffer, renderPdfToCanvas, t } from "./helperFunctions";
 import { Modal } from "bootstrap";
+import "./translateElementsOnLoad";
 
 const previewModelSelector = "#previewModal";
 const previewZoomIntBtn = document.getElementById("preview-zoom-int-btn");
@@ -29,7 +30,13 @@ let myDropzone = new Dropzone("#dropzone", {
     url: "#",
     acceptedFiles: ".pdf,.jpg,.jpeg,.png",
     uploadMultiple: true,
-    dictDefaultMessage: "Dateien zum Hochladen hier ablegen / Drop files here to upload<br>( .pdf, .png, .jpg, .jpeg )",
+    dictDefaultMessage: t({
+        de: "Dateien zum Hochladen hier ablegen",
+        en: "Drop files here to upload",
+        zh: "将文件放在这里上传",
+        ru: "Загрузите свои файлы сюда",
+        fr: "Déposer ici les fichiers à télécharger"
+    }) + "<br>( .pdf, .png, .jpg, .jpeg )",
 });
 
 myDropzone.on("addedfiles", async (files) => {
@@ -80,7 +87,6 @@ const templateHr = (content) => {
 
 // is called for each uploaded file
 async function processFile(file) {
-    //myDropzone.element.classList.add("d-none");
     myDropzone.emit("uploadprogress", file, 0);
     switch (file.type) {
         case "application/pdf":
@@ -94,18 +100,40 @@ async function processFile(file) {
             break;
         default:
             myDropzone.removeFile(file);
-            alert("Keine PDF-Dateien! | Invalid PDF file!");
+            alert(t({
+                de: "Keine PDF-Dateien!",
+                en: "Invalid PDF file!",
+                ru: "Неверный файл PDF!",
+                zh: "无效的PDF文件!",
+                fr: "Fichier PDF non valide !"
+            }));
             return;
     }
+    const filename = "name" in file ? file.name : null;
 
     const pdfFile = filesObject[filesCounter];
     let pdfDoc = await pdfjsLib.getDocument(copyArrayBuffer(pdfFile)).promise;
     const pageAmount = pdfDoc.numPages;
+
+    if (pageAmount > 20) {
+        const translation = t({
+            de: `Möchtest du wirklich ${pageAmount} Seiten der Datei "${filename}" importieren?`,
+            en: `Do you really want to import ${pageAmount} pages from the file "${filename}"?`,
+            fr: `Tu veux vraiment importer ${pageAmount} pages du fichier "${filename}" ?`,
+            zh: `你真的想从文件"${filename}"中导入${pageAmount}页吗？`,
+            ru: `Вы действительно хотите импортировать ${pageAmount} страниц из файла "${filename}"?`
+        });
+        if (!confirm(translation)) {
+            filesObject[filesCounter] = undefined
+            return;
+        }
+    }
+
     pdfDoc = undefined;
     for (let pageIndex = 1; pageIndex <= pageAmount; pageIndex++) {
         myDropzone.emit("uploadprogress", file, Math.round((pageIndex / pageAmount) * 100));
 
-        const card = template(pageCounter, "name" in file ? file.name : null);
+        const card = template(pageCounter, filename);
         container.insertAdjacentElement("beforeend", card);
 
         renderPdfToCanvas(card.querySelector(".card-body canvas"), copyArrayBuffer(pdfFile), pageIndex);
@@ -121,7 +149,14 @@ async function processFile(file) {
 
 window.removePage = function (pageID) {
     const page = document.querySelector('div[data-page-id="' + pageID + '"]');
-    if (page && confirm(`Seite ${pageID} entfernen? | Remove page ${pageID}?`) === true) {
+    const translation = t({
+        de: `Seite ${pageID} entfernen?`,
+        en: `Remove page ${pageID}?`,
+        ru: `Удалить страницу ${pageID}?`,
+        fr: `Supprimer la page ${pageID} ?`,
+        zh: `移除页面${pageID}?`
+    });
+    if (page && confirm(translation) === true) {
         page.remove();
         delete originalSizesObject[pageID];
         delete pagesObject[pageID];
@@ -129,7 +164,14 @@ window.removePage = function (pageID) {
 };
 
 window.resetPage = function () {
-    if (confirm("Zurücksetzen? | Reset?")) {
+    const translation = t({
+        de: "Zurücksetzen?",
+        en: "Reset?",
+        zh: "重置？",
+        fr: "Réinitialiser ?",
+        ru: "Перезагрузка?"
+    });
+    if (confirm(translation)) {
         location.reload();
     }
 };
@@ -152,7 +194,13 @@ window.rotatePage = async function (pageID) {
         copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
         pageInformation.pageIndex
     ).then(() => {
-        alert(`Seite ${pageID} wurde erfolgreich gedreht | Page ${pageID} was successfully rotated`);
+        alert(t({
+            de: `Seite ${pageID} wurde erfolgreich gedreht.`,
+            en: `Page ${pageID} was successfully rotated.`,
+            fr: `La page ${pageID} a été tournée avec succès.`,
+            ru: `Страница ${pageID} была успешно повернута.`,
+            zh: `页面${pageID}被成功旋转.`
+        }))
     });
 };
 
@@ -265,8 +313,13 @@ window.resizePage = function (pageID) {
                 copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
                 pageInformation.pageIndex
             ).then(() => {
-                alert(
-                    `Die Größe von Seite ${pageID} wurde erfolgreich angepasst | Page ${pageID} was successfully resized`
+                alert(t({
+                        de: `Die Größe von Seite ${pageID} wurde erfolgreich angepasst`,
+                        en: `Page ${pageID} was successfully resized`,
+                        ru: `Страница ${pageID} была успешно изменена в размере`,
+                        fr: `La page ${pageID} a été redimensionnée avec succès`,
+                        zh: `页面${pageID}已成功调整大小`
+                    })
                 );
             });
         };
@@ -280,9 +333,23 @@ window.resizePage = function (pageID) {
 
 window.savePDF = async function () {
     // ask user for new file name
-    let downloadFileName = prompt("[Dateiname/Filename].pdf");
+    let downloadFileName = prompt("[" + t({
+        de: "Dateiname",
+        en: "filename",
+        fr: "nom du fichier",
+        ru: "имя файла",
+        zh: "文件名"
+    }) + "].pdf");
+
     if (downloadFileName === null || downloadFileName === "" || downloadFileName.trim().length < 1) {
-        alert("Dateiname nicht gültig! | Filename not valid!");
+
+        alert(t({
+            de: "Dateiname nicht gültig!",
+            en: "Filename not valid!",
+            fr: "Nom de fichier non valide !",
+            ru: "Имя файла недействительно!",
+            zh: "文件名无效!"
+        }));
         return;
     }
 
@@ -302,7 +369,6 @@ window.savePDF = async function () {
 };
 
 /**
- * @param button HTMLElement
  * @returns {Promise<void>}
  */
 window.previewPDF = async function () {

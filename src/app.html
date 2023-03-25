@@ -9,16 +9,15 @@
         <div id="app" class="w-100 d-flex flex-column flex-nowrap">
             <!-- box for the buttons... -->
             <div class="d-flex justify-content-around flex-column flex-sm-row gap-2">
-                <button class="btn btn-success" onclick="savePDF()">Speichern/Save</button>
+                <button class="btn btn-success" onclick="savePDF()" id="saveButton"></button>
                 <button
                     class="btn btn-warning"
                     onclick="previewPDF()"
                     data-bs-toggle="modal"
                     data-bs-target="#previewModal"
-                >
-                    Vorschau/Preview
-                </button>
-                <button class="btn btn-danger" onclick="resetPage()">Zurücksetzen/Reset</button>
+                    id="previewButton"
+                ></button>
+                <button class="btn btn-danger" onclick="resetPage()" id="resetButton"></button>
             </div>
 
             <hr />
@@ -27,18 +26,16 @@
             <div class="d-flex flex-row flex-wrap gap-3" id="drag-area"></div>
 
             <div class="d-flex justify-content-around flex-column flex-md-row">
-                <button class="btn mt-3 btn-secondary px-md-5" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">
-                    Hochscrollen/Scroll up
-                </button>
+                <button class="btn mt-3 btn-secondary px-md-5" onclick="window.scrollTo({top: 0, behavior: 'smooth'});" id="scrollUpButton"></button>
             </div>
         </div>
 
         <!-- Preview modal -->
         <div class="modal modal-xl fade" id="previewModal" data-bs-backdrop="static" tabindex="-1">
-            <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-lg-down">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Vorschau/Preview</h1>
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel"></h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body d-flex flex-column align-items-start p-1"></div>
@@ -51,7 +48,7 @@
                         <button class="btn btn-warning" id="preview-zoom-out-btn" onclick="previewPDFZoomOut(this)">
                             <i class="gg-zoom-out mx-auto"></i>
                         </button>
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Schließen/Close</button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" id="closeText"></button>
                     </div>
                 </div>
             </div>
@@ -62,13 +59,13 @@
             <div class="modal-dialog modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Größe anpassen/Resize</h1>
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel2"></h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="d-inline-flex gap-2 flex-column">
                             <div class="input-group">
-                                <label class="input-group-text" for="preset">Voreinstellung/Preset</label>
+                                <label class="input-group-text" for="preset" id="presetLabel"></label>
                                 <select class="form-select" id="preset">
                                     <option selected></option>
                                 </select>
@@ -76,12 +73,12 @@
                             <div class="d-flex gap-2">
                                 <div class="gap-2 d-flex flex-column">
                                     <div class="input-group">
-                                        <label class="input-group-text" for="width">Breite/Width</label>
+                                        <label class="input-group-text" for="width" id="widthLabel"></label>
                                         <input type="number" class="form-control" id="width" />
                                         <span class="input-group-text">pt</span>
                                     </div>
                                     <div class="input-group">
-                                        <label class="input-group-text" for="height">Höhe/Height</label>
+                                        <label class="input-group-text" for="height" id="heightLabel"></label>
                                         <input type="number" class="form-control" id="height" />
                                         <span class="input-group-text">pt</span>
                                     </div>
@@ -108,12 +105,8 @@
                             class="btn btn-success mx-auto"
                             data-bs-dismiss="modal"
                             id="resizeModalClose"
-                        >
-                            Speichern/Save
-                        </button>
-                        <button type="button" class="btn btn-danger mx-auto" id="resizeModalReset">
-                            Zurücksetzen/Reset
-                        </button>
+                        ></button>
+                        <button type="button" class="btn btn-danger mx-auto" id="resizeModalReset"></button>
                     </div>
                 </div>
             </div>
