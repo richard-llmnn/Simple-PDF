@@ -171,77 +171,90 @@ async function getFinalArrayBuffer() {
     return await finalPDF.save({ addDefaultPage: false });
 }
 
-window.resizePage = async function (pageID) {
-    const pageInformation = pagesObject[pageID];
-    const pdfDocument = await PDFDocument.load(filesObject[pageInformation.pdfIndex]);
-    const page = pdfDocument.getPage(pageInformation.pageIndex - 1);
+window.resizePage = function (pageID) {
     const modalElement = document.getElementById("resizeModal");
     const myModal = new Modal(modalElement);
     myModal.show();
 
-    const widthElement = document.querySelector("#resizeModal #width");
-    const heightElement = document.querySelector("#resizeModal #height");
-    const pageSize = page.getSize();
-    widthElement.value = pageSize.width.toFixed(2);
-    heightElement.value = pageSize.height.toFixed(2);
+    const resizeSetup = async () => {
+        const pageInformation = pagesObject[pageID];
+        const pdfDocument = await PDFDocument.load(filesObject[pageInformation.pdfIndex]);
+        const page = pdfDocument.getPage(pageInformation.pageIndex - 1);
 
-    const select = document.querySelector("#resizeModal select");
-    Object.entries(PageSizes).forEach(([size, measurement]) => {
-        if (select.options.length <= Object.keys(PageSizes).length) {
-            const option = document.createElement("option");
-            option.value = size;
-            option.innerText = `${size} (${measurement.join("pt x ")}pt)`;
-            select.appendChild(option);
-        }
-        if (measurement[0] == pageSize.width.toFixed(2) && measurement[1] == pageSize.height.toFixed(2)) {
-            select.value = size;
-        }
-    });
+        const widthElement = document.querySelector("#resizeModal #width");
+        const heightElement = document.querySelector("#resizeModal #height");
+        const pageSize = page.getSize();
+        widthElement.value = pageSize.width.toFixed(2);
+        heightElement.value = pageSize.height.toFixed(2);
 
-    const keepAspectRatio = document.querySelector("#keepAspectRatio");
-    let aspectRatio = pageSize.width / pageSize.height;
-
-    keepAspectRatio.oninput = () => {
-        aspectRatio = widthElement.value / heightElement.value;
-    };
-
-    widthElement.oninput = () => {
-        if (keepAspectRatio.checked) {
-            heightElement.value = (widthElement.value / aspectRatio).toFixed(2);
-        }
-    };
-    heightElement.oninput = () => {
-        if (keepAspectRatio.checked) {
-            widthElement.value = (heightElement.value * aspectRatio).toFixed(2);
-        }
-    };
-
-    select.onchange = () => {
-        if (!select.value) return;
-        aspectRatio = widthElement.value / heightElement.value;
-        widthElement.value = PageSizes[select.value][0];
-        if (keepAspectRatio.checked) {
-            heightElement.value = (widthElement.value / aspectRatio).toFixed(2);
-        } else {
-            heightElement.value = PageSizes[select.value][1];
-        }
-    };
-
-    const closeModalElement = document.getElementById("resizeModalClose");
-    closeModalElement.onclick = async () => {
-        page.setSize(parseFloat(widthElement.value), parseFloat(heightElement.value));
-        filesObject[pageInformation.pdfIndex] = (await pdfDocument.save()).buffer;
-        const pageElement = document.querySelector('div[data-page-id="' + pageID + '"]');
-        renderPdfToCanvas(
-            pageElement.querySelector(".card-body canvas"),
-            copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
-            pageInformation.pageIndex
-        ).then(() => {
-            alert(
-                `Die Größe von Seite ${pageID} wurde erfolgreich angepasst | Page ${pageID} was successfully resized`
-            );
+        const select = document.querySelector("#resizeModal select");
+        select.value = undefined;
+        Object.entries(PageSizes).forEach(([size, measurement]) => {
+            if (select.options.length <= Object.keys(PageSizes).length) {
+                const option = document.createElement("option");
+                option.value = size;
+                option.innerText = `${size} (${measurement.join("pt x ")}pt)`;
+                select.appendChild(option);
+            }
+            if (measurement[0] == pageSize.width.toFixed(2) && measurement[1] == pageSize.height.toFixed(2)) {
+                select.value = size;
+            }
         });
+
+        const keepAspectRatio = document.querySelector("#keepAspectRatio");
+        keepAspectRatio.checked = true;
+        let aspectRatio = pageSize.width / pageSize.height;
+
+        keepAspectRatio.oninput = () => {
+            aspectRatio = widthElement.value / heightElement.value;
+        };
+
+        widthElement.oninput = () => {
+            if (keepAspectRatio.checked) {
+                heightElement.value = (widthElement.value / aspectRatio).toFixed(2);
+            }
+        };
+        heightElement.oninput = () => {
+            if (keepAspectRatio.checked) {
+                widthElement.value = (heightElement.value * aspectRatio).toFixed(2);
+            }
+        };
+
+        select.onchange = () => {
+            if (!select.value) return;
+            aspectRatio = widthElement.value / heightElement.value;
+            widthElement.value = PageSizes[select.value][0];
+            if (keepAspectRatio.checked) {
+                heightElement.value = (widthElement.value / aspectRatio).toFixed(2);
+            } else {
+                heightElement.value = PageSizes[select.value][1];
+            }
+        };
+
+        const closeModalElement = document.querySelector("#resizeModalClose");
+        closeModalElement.onclick = async () => {
+            page.scale(
+                parseFloat(widthElement.value) / pageSize.width.toFixed(2),
+                parseFloat(heightElement.value) / pageSize.height.toFixed(2)
+            );
+            filesObject[pageInformation.pdfIndex] = (await pdfDocument.save()).buffer;
+            const pageElement = document.querySelector('div[data-page-id="' + pageID + '"]');
+            renderPdfToCanvas(
+                pageElement.querySelector(".card-body canvas"),
+                copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
+                pageInformation.pageIndex
+            ).then(() => {
+                alert(
+                    `Die Größe von Seite ${pageID} wurde erfolgreich angepasst | Page ${pageID} was successfully resized`
+                );
+            });
+        };
+        const resetModalElement = document.querySelector("#resizeModalReset");
+        resetModalElement.onclick = () => {
+            resizeSetup();
+        };
     };
+    resizeSetup();
 };
 
 window.savePDF = async function () {
