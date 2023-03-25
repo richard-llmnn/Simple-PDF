@@ -1,8 +1,8 @@
 # Simple-PDF
 > Simple-PDF provides an easy and secure way to manage PDF files directly in your browser.  
-> You can merge PDF files, reorder pages and insert images on any device.  
+> You can merge PDF files, reorder and resize pages, insert images on any device in 5 languages.  
 
-Use it here now: [https://richard-llmnn.github.io/Simple-PDF](https://richard-llmnn.github.io/Simple-PDF)
+Use it here now in English, German, French, Russian or Chinese: [https://richard-llmnn.github.io/Simple-PDF](https://richard-llmnn.github.io/Simple-PDF)
 
 ![](docu/example.gif)
 
