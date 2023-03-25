@@ -185,8 +185,11 @@ window.resizePage = function (pageID) {
 
         originalSizesObject[pageID] ||= page.getSize();
 
-        const widthElement = document.querySelector("#resizeModal #width");
-        const heightElement = document.querySelector("#resizeModal #height");
+        let widthElement = document.querySelector("#resizeModal #width");
+        let heightElement = document.querySelector("#resizeModal #height");
+        if (page.getRotation().angle % 180 === 90) {
+            [widthElement, heightElement] = [heightElement, widthElement];
+        }
         let pageSize;
         if (!reset) {
             pageSize = page.getSize();
@@ -230,13 +233,6 @@ window.resizePage = function (pageID) {
             }
         };
 
-        select.onmouseup = function () {
-            selectChange();
-        };
-        select.onkeyup = function (ev) {
-            selectChange();
-        };
-
         const selectChange = () => {
             if (!select.value) return;
             aspectRatio = widthElement.value / heightElement.value;
@@ -246,6 +242,13 @@ window.resizePage = function (pageID) {
             } else {
                 heightElement.value = PageSizes[select.value][1];
             }
+        };
+
+        select.onmouseup = () => {
+            selectChange();
+        };
+        select.onkeyup = () => {
+            selectChange();
         };
         selectChange();
 
