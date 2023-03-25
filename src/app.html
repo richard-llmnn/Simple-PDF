@@ -66,26 +66,32 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="d-flex gap-2">
-                            <div class="form-outline">
-                                <div class="input-group mb-3">
-                                    <button class="btn btn-outline-secondary">Breite/Width</button>
-                                    <select class="form-select"></select>
-                                    <input type="number" class="form-control" id="width" />
-                                </div>
-                                <div class="input-group mb-3">
-                                    <button class="btn btn-outline-secondary">Höhe/Height</button>
-                                    <select class="form-select"></select>
-                                    <input type="number" class="form-control" id="height" />
-                                </div>
+                        <div class="d-inline-flex gap-2 flex-column">
+                            <div class="input-group">
+                                <button class="btn btn-outline-secondary">Voreinstellung/Preset</button>
+                                <select class="form-select">
+                                    <option selected></option>
+                                </select>
                             </div>
-                            <div class="d-flex flex-column justify-content-evenly">
-                                <i class="gg-corner-double-up-left mx-auto"></i>
-                                <input type="checkbox" />
-                                <i
-                                    class="gg-corner-double-up-left mx-auto"
-                                    style="transform: rotate(180deg) scaleX(-1)"
-                                ></i>
+                            <div class="d-flex gap-2">
+                                <div class="gap-2 d-flex flex-column">
+                                    <div class="input-group">
+                                        <button class="btn btn-outline-secondary">Breite/Width</button>
+                                        <input type="number" class="form-control" id="width" />
+                                    </div>
+                                    <div class="input-group">
+                                        <button class="btn btn-outline-secondary">Höhe/Height</button>
+                                        <input type="number" class="form-control" id="height" />
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column justify-content-evenly">
+                                    <i class="gg-corner-double-up-left mx-auto"></i>
+                                    <input id="keepAspectRatio" type="checkbox" checked />
+                                    <i
+                                        class="gg-corner-double-up-left mx-auto"
+                                        style="transform: rotate(180deg) scaleX(-1)"
+                                    ></i>
+                                </div>
                             </div>
                         </div>
                     </div>

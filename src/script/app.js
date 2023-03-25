@@ -52,9 +52,15 @@ const template = (page, fileName = null) => {
                 <canvas class="d-block"></canvas>
             </div>
             <div class="card-footer p-0 d-flex align-items-stretch">
-                <button class="btn btn-danger m-0 no-border-radius flex-grow-1" onclick="removePage(${page})"><i class="gg-trash mx-auto"></i></button>
-                <button class="btn btn-info m-0 no-border-radius flex-grow-1" onclick="rotatePage(${page})"><i class="gg-redo mx-auto"></i></button>
-                <button class="btn btn-warning m-0 no-border-radius flex-grow-1" onclick="resizePage(${page})"><i class="gg-expand mx-auto"></i></button>
+                <button class="btn btn-danger m-0 no-border-radius flex-grow-1" onclick="removePage(${page})">
+                    <i class="gg-trash mx-auto"></i>
+                </button>
+                <button class="btn btn-info m-0 no-border-radius flex-grow-1" onclick="rotatePage(${page})">
+                    <i class="gg-redo mx-auto"></i>
+                </button>
+                <button class="btn btn-warning m-0 no-border-radius flex-grow-1" onclick="resizePage(${page})">
+                    <i style="position:relative;top:4px;right:4px;"class="gg-expand mx-auto"></i>
+                </button>
             </div>
         </div>
         `;
@@ -172,27 +178,64 @@ window.resizePage = async function (pageID) {
     const modalElement = document.getElementById("resizeModal");
     const myModal = new Modal(modalElement);
     myModal.show();
-    const select = document.querySelectorAll("#resizeModal select");
-    select.forEach((select, index) => {
-        if (select.length < 2) {
-            Object.entries(PageSizes).forEach(([size, measurement]) => {
-                const option = document.createElement("option");
-                option.value = size;
-                option.innerText = `${size} (${measurement[index]}pt)`;
-                select.appendChild(option);
-            });
-        }
+    const select = document.querySelector("#resizeModal select");
+    Object.entries(PageSizes).forEach(([size, measurement]) => {
+        const option = document.createElement("option");
+        option.value = size;
+        option.innerText = `${size} (${measurement.join("pt x ")}pt)`;
+        select.appendChild(option);
     });
 
     const widthElement = document.querySelector("#resizeModal #width");
     const heightElement = document.querySelector("#resizeModal #height");
     const pageSize = page.getSize();
-    widthElement.value = pageSize.width;
-    heightElement.value = pageSize.height;
+    widthElement.value = pageSize.width.toFixed(2);
+    heightElement.value = pageSize.height.toFixed(2);
+
+    const keepAspectRatio = document.querySelector("#keepAspectRatio");
+    let aspectRatio = pageSize.width / pageSize.height;
+
+    keepAspectRatio.oninput = () => {
+        aspectRatio = widthElement.value / heightElement.value;
+    };
+
+    widthElement.oninput = () => {
+        if (keepAspectRatio.checked) {
+            heightElement.value = (widthElement.value / aspectRatio).toFixed(2);
+        }
+    };
+    heightElement.oninput = () => {
+        if (keepAspectRatio.checked) {
+            widthElement.value = (heightElement.value * aspectRatio).toFixed(2);
+        }
+    };
+
+    select.onchange = () => {
+        if (!select.value) return;
+        aspectRatio = widthElement.value / heightElement.value;
+        widthElement.value = PageSizes[select.value][0];
+        if (keepAspectRatio.checked) {
+            heightElement.value = (widthElement.value / aspectRatio).toFixed(2);
+        } else {
+            heightElement.value = PageSizes[select.value][1];
+        }
+    };
+
     const closeModalElement = document.getElementById("resizeModalClose");
-    closeModalElement.addEventListener("click", () => {
-        console.log(PageSizes[select.value]);
-    });
+    closeModalElement.onclick = async () => {
+        page.setSize(parseFloat(widthElement.value), parseFloat(heightElement.value));
+        filesObject[pageInformation.pdfIndex] = (await pdfDocument.save()).buffer;
+        const pageElement = document.querySelector('div[data-page-id="' + pageID + '"]');
+        renderPdfToCanvas(
+            pageElement.querySelector(".card-body canvas"),
+            copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
+            pageInformation.pageIndex
+        ).then(() => {
+            alert(
+                `Die Größe von Seite ${pageID} wurde erfolgreich angepasst | Page ${pageID} was successfully resized`
+            );
+        });
+    };
 };
 
 window.savePDF = async function () {
