@@ -13,6 +13,7 @@ const container = document.querySelector("#drag-area");
 
 let pageCounter = 1;
 let pagesObject = {};
+let originalSizesObject = {};
 let filesCounter = 1;
 let filesObject = {};
 let previewScale = 1;
@@ -122,6 +123,7 @@ window.removePage = function (pageID) {
     const page = document.querySelector('div[data-page-id="' + pageID + '"]');
     if (page && confirm(`Seite ${pageID} entfernen? | Remove page ${pageID}?`) === true) {
         page.remove();
+        delete originalSizesObject[pageID]
         delete pagesObject[pageID];
     }
 };
@@ -176,14 +178,22 @@ window.resizePage = function (pageID) {
     const myModal = new Modal(modalElement);
     myModal.show();
 
-    const resizeSetup = async () => {
+    const resizeSetup = async (reset=false) => {
         const pageInformation = pagesObject[pageID];
         const pdfDocument = await PDFDocument.load(filesObject[pageInformation.pdfIndex]);
         const page = pdfDocument.getPage(pageInformation.pageIndex - 1);
 
+        originalSizesObject[pageID] ||= page.getSize();
+
         const widthElement = document.querySelector("#resizeModal #width");
         const heightElement = document.querySelector("#resizeModal #height");
-        const pageSize = page.getSize();
+        let pageSize;
+        if (!reset){
+            pageSize = page.getSize();
+        } else {
+            pageSize = originalSizesObject[pageID]
+        }
+        
         widthElement.value = pageSize.width.toFixed(2);
         heightElement.value = pageSize.height.toFixed(2);
 
@@ -234,8 +244,8 @@ window.resizePage = function (pageID) {
         const closeModalElement = document.querySelector("#resizeModalClose");
         closeModalElement.onclick = async () => {
             page.scale(
-                parseFloat(widthElement.value) / pageSize.width.toFixed(2),
-                parseFloat(heightElement.value) / pageSize.height.toFixed(2)
+                parseFloat(widthElement.value) / page.getSize().width.toFixed(2),
+                parseFloat(heightElement.value) / page.getSize().height.toFixed(2)
             );
             filesObject[pageInformation.pdfIndex] = (await pdfDocument.save()).buffer;
             const pageElement = document.querySelector('div[data-page-id="' + pageID + '"]');
@@ -251,7 +261,7 @@ window.resizePage = function (pageID) {
         };
         const resetModalElement = document.querySelector("#resizeModalReset");
         resetModalElement.onclick = () => {
-            resizeSetup();
+            resizeSetup(true);
         };
     };
     resizeSetup();
