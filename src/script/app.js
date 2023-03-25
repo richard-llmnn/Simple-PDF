@@ -313,8 +313,13 @@ window.resizePage = function (pageID) {
                 copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
                 pageInformation.pageIndex
             ).then(() => {
-                alert(
-                    `Die Größe von Seite ${pageID} wurde erfolgreich angepasst | Page ${pageID} was successfully resized`
+                alert(t({
+                        de: `Die Größe von Seite ${pageID} wurde erfolgreich angepasst`,
+                        en: `Page ${pageID} was successfully resized`,
+                        ru: `Страница ${pageID} была успешно изменена в размере`,
+                        fr: `La page ${pageID} a été redimensionnée avec succès`,
+                        zh: `页面${pageID}已成功调整大小`
+                    })
                 );
             });
         };
