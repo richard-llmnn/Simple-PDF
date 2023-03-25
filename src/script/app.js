@@ -195,11 +195,11 @@ window.rotatePage = async function (pageID) {
         pageInformation.pageIndex
     ).then(() => {
         alert(t({
-            de: `Seite ${pageID} wurde erfolgreich gedreht`,
-            en: `Page ${pageID} was successfully rotated`,
-            fr: `La page ${pageID} a été tournée avec succès`,
-            ru: `Страница ${pageID} была успешно повернута`,
-            zh: `页面${pageID}被成功旋转`
+            de: `Seite ${pageID} wurde erfolgreich gedreht.`,
+            en: `Page ${pageID} was successfully rotated.`,
+            fr: `La page ${pageID} a été tournée avec succès.`,
+            ru: `Страница ${pageID} была успешно повернута.`,
+            zh: `页面${pageID}被成功旋转.`
         }))
     });
 };
