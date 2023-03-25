@@ -5,6 +5,7 @@ import Dropzone from "dropzone";
 import { handlePdf, handlePng, handleJpeg } from "./fileHandlers";
 import { copyArrayBuffer, renderPdfToCanvas, t } from "./helperFunctions";
 import { Modal } from "bootstrap";
+import "./translateElementsOnLoad";
 
 const previewModelSelector = "#previewModal";
 const previewZoomIntBtn = document.getElementById("preview-zoom-int-btn");
