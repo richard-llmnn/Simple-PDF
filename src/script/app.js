@@ -178,19 +178,23 @@ window.resizePage = async function (pageID) {
     const modalElement = document.getElementById("resizeModal");
     const myModal = new Modal(modalElement);
     myModal.show();
-    const select = document.querySelector("#resizeModal select");
-    Object.entries(PageSizes).forEach(([size, measurement]) => {
-        const option = document.createElement("option");
-        option.value = size;
-        option.innerText = `${size} (${measurement.join("pt x ")}pt)`;
-        select.appendChild(option);
-    });
 
     const widthElement = document.querySelector("#resizeModal #width");
     const heightElement = document.querySelector("#resizeModal #height");
     const pageSize = page.getSize();
     widthElement.value = pageSize.width.toFixed(2);
     heightElement.value = pageSize.height.toFixed(2);
+
+    const select = document.querySelector("#resizeModal select");
+    Object.entries(PageSizes).forEach(([size, measurement]) => {
+        const option = document.createElement("option");
+        option.value = size;
+        option.innerText = `${size} (${measurement.join("pt x ")}pt)`;
+        select.appendChild(option);
+        if (measurement[0] == pageSize.width.toFixed(2) && measurement[1] == pageSize.height.toFixed(2)) {
+            select.value = size;
+        }
+    });
 
     const keepAspectRatio = document.querySelector("#keepAspectRatio");
     let aspectRatio = pageSize.width / pageSize.height;
