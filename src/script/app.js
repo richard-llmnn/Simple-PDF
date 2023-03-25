@@ -187,10 +187,12 @@ window.resizePage = async function (pageID) {
 
     const select = document.querySelector("#resizeModal select");
     Object.entries(PageSizes).forEach(([size, measurement]) => {
-        const option = document.createElement("option");
-        option.value = size;
-        option.innerText = `${size} (${measurement.join("pt x ")}pt)`;
-        select.appendChild(option);
+        if (select.options.length <= Object.keys(PageSizes).length) {
+            const option = document.createElement("option");
+            option.value = size;
+            option.innerText = `${size} (${measurement.join("pt x ")}pt)`;
+            select.appendChild(option);
+        }
         if (measurement[0] == pageSize.width.toFixed(2) && measurement[1] == pageSize.height.toFixed(2)) {
             select.value = size;
         }
