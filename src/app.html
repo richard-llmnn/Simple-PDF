@@ -68,20 +68,22 @@
                     <div class="modal-body">
                         <div class="d-inline-flex gap-2 flex-column">
                             <div class="input-group">
-                                <button class="btn btn-outline-secondary">Voreinstellung/Preset</button>
-                                <select class="form-select">
+                                <label class="input-group-text" for="preset">Voreinstellung/Preset</label>
+                                <select class="form-select" id="preset">
                                     <option selected></option>
                                 </select>
                             </div>
                             <div class="d-flex gap-2">
                                 <div class="gap-2 d-flex flex-column">
                                     <div class="input-group">
-                                        <button class="btn btn-outline-secondary">Breite/Width</button>
+                                        <label class="input-group-text" for="width">Breite/Width</label>
                                         <input type="number" class="form-control" id="width" />
+                                        <span class="input-group-text">pt</span>
                                     </div>
                                     <div class="input-group">
-                                        <button class="btn btn-outline-secondary">Höhe/Height</button>
+                                        <label class="input-group-text" for="height">Höhe/Height</label>
                                         <input type="number" class="form-control" id="height" />
+                                        <span class="input-group-text">pt</span>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column justify-content-evenly">
