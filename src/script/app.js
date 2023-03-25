@@ -1,9 +1,10 @@
 import * as pdfjsLib from "pdfjs-dist/webpack";
-import { PDFDocument, degrees } from "pdf-lib";
+import { PDFDocument, degrees, PageSizes } from "pdf-lib";
 import { Sortable } from "@shopify/draggable";
 import Dropzone from "dropzone";
 import { handlePdf, handlePng, handleJpeg } from "./fileHandlers";
 import { copyArrayBuffer, renderPdfToCanvas } from "./helperFunctions";
+import { Modal } from "bootstrap";
 
 const previewModelSelector = "#previewModal";
 const previewZoomIntBtn = document.getElementById("preview-zoom-int-btn");
@@ -12,6 +13,7 @@ const container = document.querySelector("#drag-area");
 
 let pageCounter = 1;
 let pagesObject = {};
+let originalSizesObject = {};
 let filesCounter = 1;
 let filesObject = {};
 let previewScale = 1;
@@ -50,9 +52,16 @@ const template = (page, fileName = null) => {
             <div class="card-body p-0 d-flex justify-content-center align-items-center bg-black">
                 <canvas class="d-block"></canvas>
             </div>
-            <div class="card-footer p-0 d-flex">
-                <button class="btn btn-danger w-50 m-0 no-border-radius" onclick="removePage(${page})"><i class="gg-trash mx-auto"></i></button>
-                <button class="btn btn-info w-50 m-0 no-border-radius" onclick="rotatePage(${page})"><i class="gg-redo mx-auto"></i></button>
+            <div class="card-footer p-0 d-flex align-items-stretch">
+                <button class="btn btn-danger m-0 no-border-radius flex-grow-1" onclick="removePage(${page})">
+                    <i class="gg-trash mx-auto"></i>
+                </button>
+                <button class="btn btn-info m-0 no-border-radius flex-grow-1" onclick="rotatePage(${page})">
+                    <i class="gg-redo mx-auto"></i>
+                </button>
+                <button class="btn btn-warning m-0 no-border-radius flex-grow-1" onclick="resizePage(${page})">
+                    <i style="position:relative;top:4px;right:4px;"class="gg-expand mx-auto"></i>
+                </button>
             </div>
         </div>
         `;
@@ -114,6 +123,7 @@ window.removePage = function (pageID) {
     const page = document.querySelector('div[data-page-id="' + pageID + '"]');
     if (page && confirm(`Seite ${pageID} entfernen? | Remove page ${pageID}?`) === true) {
         page.remove();
+        delete originalSizesObject[pageID];
         delete pagesObject[pageID];
     }
 };
@@ -162,6 +172,111 @@ async function getFinalArrayBuffer() {
 
     return await finalPDF.save({ addDefaultPage: false });
 }
+
+window.resizePage = function (pageID) {
+    const modalElement = document.getElementById("resizeModal");
+    const myModal = new Modal(modalElement);
+    myModal.show();
+
+    const resizeSetup = async (reset = false) => {
+        const pageInformation = pagesObject[pageID];
+        const pdfDocument = await PDFDocument.load(filesObject[pageInformation.pdfIndex]);
+        const page = pdfDocument.getPage(pageInformation.pageIndex - 1);
+
+        originalSizesObject[pageID] ||= page.getSize();
+
+        let widthElement = document.querySelector("#resizeModal #width");
+        let heightElement = document.querySelector("#resizeModal #height");
+        if (page.getRotation().angle % 180 === 90) {
+            [widthElement, heightElement] = [heightElement, widthElement];
+        }
+        let pageSize;
+        if (!reset) {
+            pageSize = page.getSize();
+        } else {
+            pageSize = originalSizesObject[pageID];
+        }
+
+        widthElement.value = pageSize.width.toFixed(2);
+        heightElement.value = pageSize.height.toFixed(2);
+
+        const select = document.querySelector("#resizeModal select");
+        select.value = undefined;
+        Object.entries(PageSizes).forEach(([size, measurement]) => {
+            if (select.options.length <= Object.keys(PageSizes).length) {
+                const option = document.createElement("option");
+                option.value = size;
+                option.innerText = `${size} (${measurement.join("pt x ")}pt)`;
+                select.appendChild(option);
+            }
+            if (measurement[0] == pageSize.width.toFixed(2) && measurement[1] == pageSize.height.toFixed(2)) {
+                select.value = size;
+            }
+        });
+
+        const keepAspectRatio = document.querySelector("#keepAspectRatio");
+        keepAspectRatio.checked = true;
+        let aspectRatio = pageSize.width / pageSize.height;
+
+        keepAspectRatio.oninput = () => {
+            aspectRatio = widthElement.value / heightElement.value;
+        };
+
+        widthElement.oninput = () => {
+            if (keepAspectRatio.checked) {
+                heightElement.value = (widthElement.value / aspectRatio).toFixed(2);
+            }
+        };
+        heightElement.oninput = () => {
+            if (keepAspectRatio.checked) {
+                widthElement.value = (heightElement.value * aspectRatio).toFixed(2);
+            }
+        };
+
+        const selectChange = () => {
+            if (!select.value) return;
+            aspectRatio = widthElement.value / heightElement.value;
+            widthElement.value = PageSizes[select.value][0];
+            if (keepAspectRatio.checked) {
+                heightElement.value = (widthElement.value / aspectRatio).toFixed(2);
+            } else {
+                heightElement.value = PageSizes[select.value][1];
+            }
+        };
+
+        select.onmouseup = () => {
+            selectChange();
+        };
+        select.onkeyup = () => {
+            selectChange();
+        };
+        selectChange();
+
+        const closeModalElement = document.querySelector("#resizeModalClose");
+        closeModalElement.onclick = async () => {
+            page.scale(
+                parseFloat(widthElement.value) / page.getSize().width.toFixed(2),
+                parseFloat(heightElement.value) / page.getSize().height.toFixed(2)
+            );
+            filesObject[pageInformation.pdfIndex] = (await pdfDocument.save()).buffer;
+            const pageElement = document.querySelector('div[data-page-id="' + pageID + '"]');
+            renderPdfToCanvas(
+                pageElement.querySelector(".card-body canvas"),
+                copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
+                pageInformation.pageIndex
+            ).then(() => {
+                alert(
+                    `Die Größe von Seite ${pageID} wurde erfolgreich angepasst | Page ${pageID} was successfully resized`
+                );
+            });
+        };
+        const resetModalElement = document.querySelector("#resizeModalReset");
+        resetModalElement.onclick = () => {
+            resizeSetup(true);
+        };
+    };
+    resizeSetup();
+};
 
 window.savePDF = async function () {
     // ask user for new file name
