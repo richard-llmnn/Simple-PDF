@@ -55,4 +55,31 @@ async function renderPdfToCanvas(canvas, arrayBuffer, pageId) {
     });
 }
 
-export { getHeightAndWidthFromImage, copyArrayBuffer, renderPdfToCanvas };
+/**
+ * translate to browser or given language
+ * if lang === null, the browser language is used
+ */
+function t(translations = {de: "", en: "", zh: "", ru: "", fr: ""}, lang = null) {
+    const fallbackLanguage = "de";
+
+    if (lang === null) {
+        /**
+         * @description get language code in lower case
+         * @example en-US -> en, EN-GB -> en, de -> de
+          */
+        const browserLanguageCode = navigator.language.slice(0, 2).toLocaleLowerCase();
+
+        if (Object.keys(translations).includes(browserLanguageCode)) {
+            return translations[browserLanguageCode]
+        }
+    } else {
+        if (Object.keys(translations).includes(lang)) {
+            return translations[lang];
+        }
+    }
+
+    return translations[fallbackLanguage];
+
+}
+
+export { getHeightAndWidthFromImage, copyArrayBuffer, renderPdfToCanvas, t };
