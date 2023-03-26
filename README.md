@@ -22,8 +22,9 @@ It is written in JavaScript and utilizes [pdf.js](https://mozilla.github.io/pdf.
 1. Checkout to branch `master` and pull the latest version
 2. Set new version in `package.json` file
 3. Run `npm install`
-2. Commit and push updated `package.json` and `package.lock` file
-3. Run `npm run deploy`
+4. Commit and push updated `package.json` and `package.lock` file
+5. Run `git tag "[package.json verion here]"` and then `git push --tags`
+6. Run `npm run deploy`
 
 ## Used Libraries
 - https://getbootstrap.com/docs/5.0/getting-started/introduction/
