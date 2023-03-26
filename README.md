@@ -17,11 +17,12 @@ It is written in JavaScript and utilizes [pdf.js](https://mozilla.github.io/pdf.
 | npm run format     | Format source files in `src/` directory with prettier                      |
 | npm run deploy     | Deploy current version of branch `master` to github pages                  |
 
-**Update Github-Pages:**
+### Update Github-Pages:
 
-1. Checkout to branch `master`
+1. Checkout to branch `master` and pull the latest version
 2. Set new version in `package.json` file
-2. Commit and push updated `package.json` file
+3. Run `npm install`
+2. Commit and push updated `package.json` and `package.lock` file
 3. Run `npm run deploy`
 
 ## Used Libraries
