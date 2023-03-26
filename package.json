@@ -1,6 +1,6 @@
 {
   "name": "Simple-PDF",
-  "version": "1.4.0",
+  "version": "1.1.1",
   "main": "dist/index.html",
   "repository": "git@github.com:richard-llmnn/Simple-PDF.git",
   "license": "MIT",
