@@ -1,7 +1,5 @@
 "use strict";
 
-import * as pdfjsLib from "pdfjs-dist/webpack";
-
 async function getHeightAndWidthFromImage(dataURL) {
     return new Promise((resolve) => {
         const img = new Image();
@@ -21,13 +19,15 @@ function copyArrayBuffer(src) {
     return dst;
 }
 
-async function renderPdfToCanvas(canvas, arrayBuffer, pageId) {
-    const context = canvas.getContext("2d");
-
-    const pdfDoc = await pdfjsLib.getDocument(arrayBuffer).promise; // array buffer(file) to object
-    const pdfPage = await pdfDoc.getPage(pageId); // get specific page from file
+/**
+ *
+ * @param canvas HTMLCanvasElement
+ * @param pdfPage PDFPage
+ * @returns {Promise<void>}
+ */
+async function renderPdfToCanvas(canvas, pdfPage) {
     let pdfViewportOriginal = pdfPage.getViewport({ scale: 1 });
-    let scale = 1;
+    let scale;
 
     let pdfWidth = pdfViewportOriginal.width;
     let pdfHeight = pdfViewportOriginal.height;
@@ -41,6 +41,7 @@ async function renderPdfToCanvas(canvas, arrayBuffer, pageId) {
         scale = 250 / pdfWidth;
     }
 
+    const context = canvas.getContext("2d");
     // clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
     const pdfViewport = pdfPage.getViewport({ scale });

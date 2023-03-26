@@ -23,6 +23,7 @@ let previewScale = 1;
 const drag = new Sortable(container, {
     draggable: ".card-auto-size",
     handle: ".card-body",
+
 });
 
 let myDropzone = new Dropzone("#dropzone", {
@@ -132,14 +133,16 @@ async function processFile(file) {
         }
     }
 
-    pdfDoc = undefined;
     for (let pageIndex = 1; pageIndex <= pageAmount; pageIndex++) {
         myDropzone.emit("uploadprogress", file, Math.round((pageIndex / pageAmount) * 100));
 
         const card = template(pageCounter, filename);
         container.insertAdjacentElement("beforeend", card);
 
-        renderPdfToCanvas(card.querySelector(".card-body canvas"), copyArrayBuffer(pdfFile), pageIndex);
+        await renderPdfToCanvas(
+            card.querySelector(".card-body canvas"),
+            await pdfDoc.getPage(pageIndex)
+        );
 
         pagesObject[pageCounter] = {
             pageIndex: pageIndex,
@@ -186,16 +189,17 @@ window.rotatePage = async function (pageID) {
     const pdfDocument = await PDFDocument.load(filesObject[pageInformation.pdfIndex]);
     const page = pdfDocument.getPage(pageInformation.pageIndex - 1);
     // add 90 degrees
-    const newRotationAngle = (page.getRotation().angle + 90) % 360;
+    const newRotationAngle = (page.getRotation().angle - 90) % 360;
     page.setRotation(degrees(newRotationAngle));
     // save new pdf file as array buffer
     filesObject[pageInformation.pdfIndex] = (await pdfDocument.save()).buffer;
 
+    let pdfDoc = await pdfjsLib.getDocument(copyArrayBuffer(filesObject[pageInformation.pdfIndex])).promise;
+
     // rerender canvas
     renderPdfToCanvas(
         pageElement.querySelector(".card-body canvas"),
-        copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
-        pageInformation.pageIndex
+        await pdfDoc.getPage(pageInformation.pageIndex)
     ).then(() => {
         alert(
             t({
@@ -313,21 +317,23 @@ window.resizePage = function (pageID) {
             );
             filesObject[pageInformation.pdfIndex] = (await pdfDocument.save()).buffer;
             const pageElement = document.querySelector('div[data-page-id="' + pageID + '"]');
-            renderPdfToCanvas(
+
+            let pdfDoc = await pdfjsLib.getDocument(copyArrayBuffer(filesObject[pageInformation.pdfIndex])).promise;
+
+            await renderPdfToCanvas(
                 pageElement.querySelector(".card-body canvas"),
-                copyArrayBuffer(filesObject[pageInformation.pdfIndex]),
-                pageInformation.pageIndex
-            ).then(() => {
-                alert(
-                    t({
-                        de: `Die Größe von Seite ${pageID} wurde erfolgreich angepasst`,
-                        en: `Page ${pageID} was successfully resized`,
-                        ru: `Страница ${pageID} была успешно изменена в размере`,
-                        fr: `La page ${pageID} a été redimensionnée avec succès`,
-                        zh: `页面${pageID}已成功调整大小`,
-                    })
-                );
-            });
+                await pdfDoc.getPage(pageInformation.pageIndex)
+            )
+
+            alert(
+                t({
+                    de: `Die Größe von Seite ${pageID} wurde erfolgreich angepasst`,
+                    en: `Page ${pageID} was successfully resized`,
+                    ru: `Страница ${pageID} была успешно изменена в размере`,
+                    fr: `La page ${pageID} a été redimensionnée avec succès`,
+                    zh: `页面${pageID}已成功调整大小`,
+                })
+            );
         };
         const resetModalElement = document.querySelector("#resizeModalReset");
         resetModalElement.onclick = () => {
@@ -387,8 +393,9 @@ window.previewPDF = async function () {
     const modalBody = modalElement.querySelector(".modal-body");
     modalBody.innerHTML = null; // clear modal
     const pdfObject = await pdfjsLib.getDocument(await getFinalArrayBuffer()).promise;
+    const pagesCount = pdfObject.numPages;
 
-    for (let pageId = 1; pageId <= pdfObject.numPages; pageId++) {
+    for (let pageId = 1; pageId <= pagesCount; pageId++) {
         const page = await pdfObject.getPage(pageId);
         const viewport = page.getViewport({ scale: previewScale });
 
