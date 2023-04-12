@@ -23,7 +23,6 @@ let previewScale = 1;
 const drag = new Sortable(container, {
     draggable: ".card-auto-size",
     handle: ".card-body",
-
 });
 
 let myDropzone = new Dropzone("#dropzone", {
@@ -139,10 +138,7 @@ async function processFile(file) {
         const card = template(pageCounter, filename);
         container.insertAdjacentElement("beforeend", card);
 
-        await renderPdfToCanvas(
-            card.querySelector(".card-body canvas"),
-            await pdfDoc.getPage(pageIndex)
-        );
+        await renderPdfToCanvas(card.querySelector(".card-body canvas"), await pdfDoc.getPage(pageIndex));
 
         pagesObject[pageCounter] = {
             pageIndex: pageIndex,
@@ -323,7 +319,7 @@ window.resizePage = function (pageID) {
             await renderPdfToCanvas(
                 pageElement.querySelector(".card-body canvas"),
                 await pdfDoc.getPage(pageInformation.pageIndex)
-            )
+            );
 
             alert(
                 t({
