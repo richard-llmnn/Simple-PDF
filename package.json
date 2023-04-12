@@ -25,6 +25,10 @@
     "pdfjs-dist": "^3.4.120",
     "prettier": "^2.8.5"
   },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "engineStrict": true,
   "scripts": {
     "build-dev": "webpack build",
     "build-prod": "webpack build --mode='production'",
