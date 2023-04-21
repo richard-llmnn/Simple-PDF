@@ -10,6 +10,7 @@
     "gh-pages": "^5.0.0",
     "html-webpack-plugin": "^5.5.1",
     "mini-css-extract-plugin": "^2.7.5",
+    "prettier": "^2.8.7",
     "sass": "^1.62.0",
     "sass-loader": "^13.2.2",
     "webpack": "^5.79.0",
@@ -22,8 +23,7 @@
     "css.gg": "^2.0.0",
     "dropzone": "^6.0.0-beta.2",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^3.5.141",
-    "prettier": "^2.8.5"
+    "pdfjs-dist": "^3.5.141"
   },
   "engines": {
     "node": ">=14.0.0"
