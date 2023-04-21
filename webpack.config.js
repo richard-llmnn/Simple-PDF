@@ -32,7 +32,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.join(__dirname, "src/app.html"),
             inject: "body", // if is set to "body", "head" or true you have to remove the webpack tags from the template!
-            favicon: false, // do not user favicon, because we set multiple icons in the template
+            favicon: "./src/favicon.png", // do not user favicon, because we set multiple icons in the template
             hash: true,
             minify: false
         })
