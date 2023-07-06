@@ -1,29 +1,29 @@
 {
   "name": "Simple-PDF",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "main": "dist/index.html",
   "repository": "git@github.com:richard-llmnn/Simple-PDF.git",
   "license": "MIT",
   "devDependencies": {
     "clean-webpack-plugin": "^4.0.0",
-    "css-loader": "^6.7.3",
+    "css-loader": "^6.8.1",
     "gh-pages": "^5.0.0",
-    "html-webpack-plugin": "^5.5.1",
-    "mini-css-extract-plugin": "^2.7.5",
-    "prettier": "^2.8.8",
-    "sass": "^1.62.0",
-    "sass-loader": "^13.2.2",
-    "webpack": "^5.80.0",
-    "webpack-cli": "^5.0.2",
-    "webpack-dev-server": "^4.13.3"
+    "html-webpack-plugin": "^5.5.3",
+    "mini-css-extract-plugin": "^2.7.6",
+    "prettier": "^3.0.0",
+    "sass": "^1.63.6",
+    "sass-loader": "^13.3.2",
+    "webpack": "^5.88.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
     "@shopify/draggable": "^1.0.0-beta.8",
-    "bootstrap": "^5.2.3",
-    "css.gg": "^2.0.0",
+    "bootstrap": "^5.3.0",
+    "css.gg": "^2.1.1",
     "dropzone": "^6.0.0-beta.2",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^3.5.141"
+    "pdfjs-dist": "^3.8.162"
   },
   "engines": {
     "node": ">=14.0.0"
