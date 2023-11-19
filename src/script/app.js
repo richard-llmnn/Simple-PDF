@@ -108,7 +108,7 @@ async function processFile(file) {
                     ru: "Неверный файл PDF!",
                     zh: "无效的PDF文件!",
                     fr: "Fichier PDF non valide !",
-                })
+                }),
             );
             return;
     }
@@ -195,7 +195,7 @@ window.rotatePage = async function (pageID) {
     // rerender canvas
     renderPdfToCanvas(
         pageElement.querySelector(".card-body canvas"),
-        await pdfDoc.getPage(pageInformation.pageIndex)
+        await pdfDoc.getPage(pageInformation.pageIndex),
     ).then(() => {
         alert(
             t({
@@ -204,7 +204,7 @@ window.rotatePage = async function (pageID) {
                 fr: `La page ${pageID} a été tournée avec succès.`,
                 ru: `Страница ${pageID} была успешно повернута.`,
                 zh: `页面${pageID}被成功旋转.`,
-            })
+            }),
         );
     });
 };
@@ -309,7 +309,7 @@ window.resizePage = function (pageID) {
         closeModalElement.onclick = async () => {
             page.scale(
                 parseFloat(widthElement.value) / page.getSize().width.toFixed(2),
-                parseFloat(heightElement.value) / page.getSize().height.toFixed(2)
+                parseFloat(heightElement.value) / page.getSize().height.toFixed(2),
             );
             filesObject[pageInformation.pdfIndex] = (await pdfDocument.save()).buffer;
             const pageElement = document.querySelector('div[data-page-id="' + pageID + '"]');
@@ -318,7 +318,7 @@ window.resizePage = function (pageID) {
 
             await renderPdfToCanvas(
                 pageElement.querySelector(".card-body canvas"),
-                await pdfDoc.getPage(pageInformation.pageIndex)
+                await pdfDoc.getPage(pageInformation.pageIndex),
             );
 
             alert(
@@ -328,7 +328,7 @@ window.resizePage = function (pageID) {
                     ru: `Страница ${pageID} была успешно изменена в размере`,
                     fr: `La page ${pageID} a été redimensionnée avec succès`,
                     zh: `页面${pageID}已成功调整大小`,
-                })
+                }),
             );
         };
         const resetModalElement = document.querySelector("#resizeModalReset");
@@ -350,7 +350,7 @@ window.savePDF = async function () {
                 ru: "имя файла",
                 zh: "文件名",
             }) +
-            "].pdf"
+            "].pdf",
     );
 
     if (downloadFileName === null || downloadFileName === "" || downloadFileName.trim().length < 1) {
@@ -361,7 +361,7 @@ window.savePDF = async function () {
                 fr: "Nom de fichier non valide !",
                 ru: "Имя файла недействительно!",
                 zh: "文件名无效!",
-            })
+            }),
         );
         return;
     }
