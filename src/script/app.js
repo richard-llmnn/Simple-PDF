@@ -1,4 +1,4 @@
-import * as pdfjsLib from "pdfjs-dist/webpack";
+import * as pdfjsLib from "pdfjs-dist/webpack.mjs";
 import { PDFDocument, degrees, PageSizes } from "pdf-lib";
 import { Sortable } from "@shopify/draggable";
 import Dropzone from "dropzone";

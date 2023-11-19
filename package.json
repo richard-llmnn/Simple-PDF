@@ -1,13 +1,13 @@
 {
   "name": "Simple-PDF",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "main": "dist/index.html",
   "repository": "git@github.com:richard-llmnn/Simple-PDF.git",
   "license": "MIT",
   "devDependencies": {
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.8.1",
-    "gh-pages": "^5.0.0",
+    "gh-pages": "^6.1.0",
     "html-webpack-plugin": "^5.5.3",
     "mini-css-extract-plugin": "^2.7.6",
     "prettier": "^3.0.0",
@@ -23,10 +23,10 @@
     "css.gg": "^2.1.1",
     "dropzone": "^6.0.0-beta.2",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^3.8.162"
+    "pdfjs-dist": "^4.0.189"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "engineStrict": true,
   "scripts": {
