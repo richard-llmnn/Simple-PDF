@@ -23,7 +23,7 @@
     "css.gg": "^2.1.1",
     "dropzone": "^6.0.0-beta.2",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^4.0.189"
+    "pdfjs-dist": "^4.0.379"
   },
   "engines": {
     "node": ">=16.0.0"
