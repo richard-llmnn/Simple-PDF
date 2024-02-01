@@ -9,7 +9,7 @@
     "css-loader": "^6.8.1",
     "gh-pages": "^6.1.0",
     "html-webpack-plugin": "^5.5.3",
-    "mini-css-extract-plugin": "^2.7.6",
+    "mini-css-extract-plugin": "^2.8.0",
     "prettier": "^3.0.0",
     "sass": "^1.63.6",
     "sass-loader": "^14.0.0",
