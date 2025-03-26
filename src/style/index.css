@@ -1,10 +1,11 @@
-@forward "bootstrap/scss/bootstrap";
-@forward "icons";
-@forward "dropzone/src/dropzone";
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "icons";
+@import "dropzone/dist/dropzone.css";
 
 .card-auto-size {
     width: 250px;
     box-sizing: content-box;
+
     .card-body {
         cursor: grab;
     }

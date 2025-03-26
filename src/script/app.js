@@ -1,4 +1,5 @@
-import * as pdfjsLib from "pdfjs-dist/webpack.mjs";
+import * as pdfjsLib from "pdfjs-dist";
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.min.mjs" with { type: "file" };
 import { PDFDocument, degrees, PageSizes } from "pdf-lib";
 import { Sortable } from "@shopify/draggable";
 import Dropzone from "dropzone";
@@ -6,6 +7,8 @@ import { handlePdf, handlePng, handleJpeg } from "./fileHandlers";
 import { copyArrayBuffer, renderPdfToCanvas, t } from "./helperFunctions";
 import { Modal } from "bootstrap";
 import "./translateElementsOnLoad";
+
+pdfjsLib.GlobalWorkerOptions.workerPort = new Worker(pdfjsWorker, { type: "module" });
 
 const previewModelSelector = "#previewModal";
 const previewZoomIntBtn = document.getElementById("preview-zoom-int-btn");

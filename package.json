@@ -5,35 +5,26 @@
   "repository": "git@github.com:richard-llmnn/Simple-PDF.git",
   "license": "MIT",
   "devDependencies": {
-    "clean-webpack-plugin": "^4.0.0",
-    "css-loader": "^6.8.1",
-    "gh-pages": "^6.1.0",
-    "html-webpack-plugin": "^5.5.3",
-    "mini-css-extract-plugin": "^2.7.6",
-    "prettier": "^3.0.0",
-    "sass": "^1.63.6",
-    "sass-loader": "^14.0.0",
-    "webpack": "^5.88.1",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "gh-pages": "^6.3.0",
+    "prettier": "^3.5.3"
   },
   "dependencies": {
-    "@shopify/draggable": "^1.0.0-beta.8",
-    "bootstrap": "^5.3.0",
-    "css.gg": "^2.1.1",
+    "@shopify/draggable": "^1.1.4",
+    "bootstrap": "^5.3.3",
+    "css.gg": "=2.1.1",
     "dropzone": "^6.0.0-beta.2",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^4.0.189"
+    "pdfjs-dist": "^5.0.375"
   },
   "engines": {
     "node": ">=20.0.0"
   },
   "engineStrict": true,
   "scripts": {
-    "build-dev": "webpack build",
-    "build-prod": "webpack build --mode='production'",
-    "serve": "webpack serve",
+    "build:dev": "bun build src/app.html --entry-naming=index.html --chunk-naming=\"index.[ext]\" --outdir=dist",
+    "build:prod": "bun build src/app.html --entry-naming=index.html --chunk-naming=\"index.[ext]\" --outdir=dist --production",
+    "serve": "bun src/app.html",
     "format": "prettier --print-width=120  --tab-width=4 --write src/",
-    "deploy": "npm run build-prod && gh-pages --message \"Deploy version $npm_package_version\" --dist dist"
+    "deploy": "rm -rf dist && bun run build:prod && gh-pages --message \"Deploy version $npm_package_version\" --dist dist"
   }
 }

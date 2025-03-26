@@ -11,20 +11,20 @@ It is written in JavaScript and utilizes [pdf.js](https://mozilla.github.io/pdf.
 ## Developer Info
 | Command            | Documentation                                                              |
 |--------------------|----------------------------------------------------------------------------|
-| npm run build-dev  | Bundle the program with webpack in dev mode (sourcemaps, not minified, ...) |
-| npm run build-prod | Bundle the program with webpack in prod mode (minified, ...)               |
-| npm run serve      | Serve the program with webpacks webserver (automatic rebuilding)           |
-| npm run format     | Format source files in `src/` directory with prettier                      |
-| npm run deploy     | Deploy current version of branch `master` to github pages                  |
+| bun run build:dev  | Bundle the program with bun in dev mode (sourcemaps, not minified, ...)    |
+| bun run build:prod | Bundle the program with bun in prod mode (minified, ...)                   |
+| bun run serve      | Serve the program with bun's dev server and HMR                            |
+| bun run format     | Format source files in `src/` directory with prettier                      |
+| bun run deploy     | Deploy current version of branch `master` to github pages                  |
 
 ### Update Github-Pages:
 
 1. Checkout to branch `master` and pull the latest version
 2. Set new version in `package.json` file
-3. Run `npm install`
-4. Commit and push updated `package.json` and `package.lock` file
+3. Run `bun install`
+4. Commit and push updated `package.json` and `bun.lock` file
 5. Run `git tag "[package.json verion here]"` and then `git push --tags`
-6. Run `npm run deploy`
+6. Run `bun run deploy`
 
 ## Used Libraries
 - https://getbootstrap.com/docs/5.0/getting-started/introduction/
